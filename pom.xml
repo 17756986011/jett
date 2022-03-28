@@ -11,7 +11,7 @@
         <module>jett-core</module>
     </modules>
     <description>
-        JETT is a Java API that reads an Excel spreadsheet as a template, takes your data, and creates a new Excel spreadsheet that contains your data, formatted as in the template. It works with .xls and .xlsx template spreadsheets.
+        JETT 是一个 Java API，它读取 Excel 电子表格作为模板，获取您的数据，并创建一个包含您的数据的新 Excel 电子表格，格式与模板中的一样。它适用于 .xls 和 .xlsx 模板电子表格。
     </description>
     <developers>
         <developer>

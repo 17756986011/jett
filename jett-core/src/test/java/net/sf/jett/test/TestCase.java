@@ -19,66 +19,58 @@ import static org.junit.Assert.*;
 import net.sf.jett.transform.ExcelTransformer;
 
 /**
- * A <code>TestCase</code> is the superclass for all JETT JUnit test classes.
+ * <code>TestCase<code> 是所有 JETT JUnit 测试类的超类。
  *
  * @author Randy Gettman
  */
-public abstract class TestCase
-{
-
+public abstract class TestCase {
     /**
-     * Standard extremely small delta value to satisfy
-     * <code>Assert.assertEquals(double, double, double)</code>.
+     * 满足 <code>Assert.assertEquals(double, double, double)<code> 的标准极小增量值。
      */
     public static final double DELTA = 0.00000000001;
 
-    protected static final String TEMPLATES_DIR = "templates/";
-    protected static final String OUTPUT_DIR = "output/";
-    protected static final String TEMPLATE_SUFFIX = "Template";
-    protected static final String OUTPUT_SUFFIX = "Result";
     protected static final String XLS_EXT = ".xls";
     protected static final String XLSX_EXT = ".xlsx";
     protected static final String FILES_IND = "Files";
+    protected static final String OUTPUT_DIR = "output/";
+    protected static final String OUTPUT_SUFFIX = "Result";
+    protected static final String TEMPLATE_SUFFIX = "Template";
+    protected static final String TEMPLATES_DIR = "templates/";
 
     protected boolean amISetup = false;
     protected Map<String, Object> myBeansMap;
-    protected List<Map<String, Object>> myListOfBeansMaps;
-    protected List<String> myTemplateSheetNames;
     protected List<String> myResultSheetNames;
+    protected List<String> myTemplateSheetNames;
+    protected List<Map<String, Object>> myListOfBeansMaps;
 
     /**
-     * Tests the .xls template spreadsheet.  This is meant to have the
-     * <code>@Test</code> annotation in all concrete subclasses.  Also, each
-     * concrete subclass should simply call <code>super.testXls</code>.
+     * 测试 .xls 模板电子表格。这意味着在所有具体子类中都有 <code>@Test<code> 注释。
+     * 此外，每个具体的子类都应该简单地调用 <code>super.testXls<code>。
      *
-     * @throws IOException            If an I/O error occurs.
-     * @throws InvalidFormatException If the input spreadsheet is invalid.
+     * @throws IOException            如果发生 IO 错误。
+     * @throws InvalidFormatException 如果输入的电子表格无效。
      */
-    public void testXls() throws IOException, InvalidFormatException
-    {
+    public void testXls() throws IOException, InvalidFormatException {
         File fOutputDir = new File(OUTPUT_DIR);
-        if (!fOutputDir.exists() && !fOutputDir.mkdirs())
-        {
+        if (!fOutputDir.exists() && !fOutputDir.mkdirs()) {
             throw new RuntimeException("Couldn't create output directory: " + OUTPUT_DIR);
         }
-        String excelNameBase = getExcelNameBase();
-        genericTest(TEMPLATES_DIR + excelNameBase + TEMPLATE_SUFFIX + XLS_EXT,
+        // 获取模板和文件名称
+        String excelNameBase = this.getExcelNameBase();
+        this.genericTest(TEMPLATES_DIR + excelNameBase + TEMPLATE_SUFFIX + XLS_EXT,
                 OUTPUT_DIR + excelNameBase + OUTPUT_SUFFIX + XLS_EXT);
     }
 
     /**
-     * Tests the .xlsx template spreadsheet.  This is meant to have the
-     * <code>@Test</code> annotation in all concrete subclasses.  Also, each
-     * concrete subclass should simply call <code>super.testXlsx</code>.
+     * 测试 .xlsx 模板电子表格。这意味着在所有具体子类中都有 <code>@Test<code> 注释。
+     * 此外，每个具体的子类都应该简单地调用 <code>super.testXlsx<code>。
      *
-     * @throws IOException            If an I/O error occurs.
-     * @throws InvalidFormatException If the input spreadsheet is invalid.
+     * @throws IOException            如果发生 IO 错误。
+     * @throws InvalidFormatException 如果输入的电子表格无效。
      */
-    public void testXlsx() throws IOException, InvalidFormatException
-    {
+    public void testXlsx() throws IOException, InvalidFormatException {
         File fOutputDir = new File(OUTPUT_DIR);
-        if (!fOutputDir.exists() && !fOutputDir.mkdirs())
-        {
+        if (!fOutputDir.exists() && !fOutputDir.mkdirs()) {
             throw new RuntimeException("Couldn't create output directory: " + OUTPUT_DIR);
         }
         String excelNameBase = getExcelNameBase();
@@ -87,19 +79,16 @@ public abstract class TestCase
     }
 
     /**
-     * Tests the .xls template spreadsheet.  This is meant to have the
-     * <code>@Test</code> annotation in all concrete subclasses.  Also, each
-     * concrete subclass should simply call <code>super.testXlsFiles</code>.
+     * 测试 .xls 模板电子表格。这意味着在所有具体子类中都有 <code>@Test<code> 注释。
+     * 此外，每个具体的子类都应该简单地调用 <code>super.testXlsFiles<code>。
      *
-     * @throws IOException            If an I/O error occurs.
-     * @throws InvalidFormatException If the input spreadsheet is invalid.
+     * @throws IOException            如果发生 IO 错误。
+     * @throws InvalidFormatException 如果输入的电子表格无效。
      * @since 0.2.0
      */
-    public void testXlsFiles() throws IOException, InvalidFormatException
-    {
+    public void testXlsFiles() throws IOException, InvalidFormatException {
         File fOutputDir = new File(OUTPUT_DIR);
-        if (!fOutputDir.exists() && !fOutputDir.mkdirs())
-        {
+        if (!fOutputDir.exists() && !fOutputDir.mkdirs()) {
             throw new RuntimeException("Couldn't create output directory: " + OUTPUT_DIR);
         }
         String excelNameBase = getExcelNameBase();
@@ -108,19 +97,16 @@ public abstract class TestCase
     }
 
     /**
-     * Tests the .xlsx template spreadsheet.  This is meant to have the
-     * <code>@Test</code> annotation in all concrete subclasses.  Also, each
-     * concrete subclass should simply call <code>super.testXlsFiles</code>.
+     * 测试 .xlsx 模板电子表格。这意味着在所有具体子类中都有 <code>@Test<code> 注释。
+     * 此外，每个具体的子类都应该简单地调用 <code>super.testXlsFiles<code>。
      *
-     * @throws IOException            If an I/O error occurs.
-     * @throws InvalidFormatException If the input spreadsheet is invalid.
+     * @throws IOException            如果发生 IO 错误。
+     * @throws InvalidFormatException 如果输入的电子表格无效。
      * @since 0.2.0
      */
-    public void testXlsxFiles() throws IOException, InvalidFormatException
-    {
+    public void testXlsxFiles() throws IOException, InvalidFormatException {
         File fOutputDir = new File(OUTPUT_DIR);
-        if (!fOutputDir.exists() && !fOutputDir.mkdirs())
-        {
+        if (!fOutputDir.exists() && !fOutputDir.mkdirs()) {
             throw new RuntimeException("Couldn't create output directory: " + OUTPUT_DIR);
         }
         String excelNameBase = getExcelNameBase();
@@ -133,22 +119,19 @@ public abstract class TestCase
      *
      * @param inFilename  The input filename.
      * @param outFilename The output filename.
+     *
      * @throws IOException            If an I/O error occurs.
      * @throws InvalidFormatException If the input spreadsheet is invalid.
      */
     protected void genericTest(String inFilename, String outFilename)
-            throws IOException, InvalidFormatException
-    {
+            throws IOException, InvalidFormatException {
         try (FileOutputStream fileOut = new FileOutputStream(outFilename);
-             InputStream fileIn = new BufferedInputStream(new FileInputStream(inFilename)))
-        {
+             InputStream fileIn = new BufferedInputStream(new FileInputStream(inFilename))) {
             Workbook workbook;
             ExcelTransformer transformer = new ExcelTransformer();
-            setupTransformer(transformer);
-            if (isMultipleBeans())
-            {
-                if (!amISetup)
-                {
+            this.setupTransformer(transformer);
+            if (this.isMultipleBeans()) {
+                if (!amISetup) {
                     myTemplateSheetNames = getListOfTemplateSheetNames();
                     myResultSheetNames = getListOfResultSheetNames();
                     myListOfBeansMaps = getListOfBeansMaps();
@@ -159,12 +142,9 @@ public abstract class TestCase
                 assertNotNull(myListOfBeansMaps);
                 workbook = transformer.transform(
                         fileIn, myTemplateSheetNames, myResultSheetNames, myListOfBeansMaps);
-            }
-            else
-            {
-                if (!amISetup)
-                {
-                    myBeansMap = getBeansMap();
+            } else {
+                if (!amISetup) {
+                    myBeansMap = this.getBeansMap();
                     amISetup = true;
                 }
                 assertNotNull(myBeansMap);
@@ -174,37 +154,32 @@ public abstract class TestCase
             // Becomes invalid after write().
             Error error = null;
             RuntimeException exception = null;
-            try
-            {
-                if (!(workbook instanceof HSSFWorkbook))
+            try {
+                if (!(workbook instanceof HSSFWorkbook)) {
                     check(workbook);
-            }
-            catch (RuntimeException e)
-            {
+                }
+            } catch (RuntimeException e) {
                 exception = e;
-            }
-            catch (Error e)
-            {
+            } catch (Error e) {
                 error = e;
             }
 
             workbook.write(fileOut);
             fileOut.close();
 
-            if (error != null)
-            {
+            if (error != null) {
                 error.printStackTrace();
                 fail();
             }
-            if (exception != null)
-            {
+            if (exception != null) {
                 exception.printStackTrace();
                 throw exception;
             }
 
             // Check HSSF after writing to see errors.
-            if (workbook instanceof HSSFWorkbook)
+            if (workbook instanceof HSSFWorkbook) {
                 check(workbook);
+            }
         }
     }
 
@@ -214,19 +189,17 @@ public abstract class TestCase
      *
      * @param inFilename  The input filename.
      * @param outFilename The output filename.
+     *
      * @throws IOException            If an I/O error occurs.
      * @throws InvalidFormatException If the input spreadsheet is invalid.
      * @since 0.2.0
      */
     private void genericTestFiles(String inFilename, String outFilename)
-            throws IOException, InvalidFormatException
-    {
+            throws IOException, InvalidFormatException {
         ExcelTransformer transformer = new ExcelTransformer();
         setupTransformer(transformer);
-        if (isMultipleBeans())
-        {
-            if (!amISetup)
-            {
+        if (isMultipleBeans()) {
+            if (!amISetup) {
                 myTemplateSheetNames = getListOfTemplateSheetNames();
                 myResultSheetNames = getListOfResultSheetNames();
                 myListOfBeansMaps = getListOfBeansMaps();
@@ -237,11 +210,8 @@ public abstract class TestCase
             assertNotNull(myListOfBeansMaps);
             transformer.transform(inFilename, outFilename,
                     myTemplateSheetNames, myResultSheetNames, myListOfBeansMaps);
-        }
-        else
-        {
-            if (!amISetup)
-            {
+        } else {
+            if (!amISetup) {
                 myBeansMap = getBeansMap();
                 amISetup = true;
             }
@@ -249,8 +219,7 @@ public abstract class TestCase
             transformer.transform(inFilename, outFilename, myBeansMap);
         }
 
-        try (InputStream fileIn = new BufferedInputStream(new FileInputStream(outFilename)))
-        {
+        try (InputStream fileIn = new BufferedInputStream(new FileInputStream(outFilename))) {
             Workbook workbook = WorkbookFactory.create(fileIn);
             check(workbook);
         }
@@ -271,8 +240,7 @@ public abstract class TestCase
      * @param transformer The <code>ExcelTransformer</code> that will transform
      *                    the template worksheet(s).
      */
-    protected void setupTransformer(ExcelTransformer transformer)
-    {
+    protected void setupTransformer(ExcelTransformer transformer) {
     }
 
     /**
@@ -281,6 +249,7 @@ public abstract class TestCase
      * class.
      *
      * @param workbook A <code>Workbook</code>.
+     *
      * @see TestUtility
      */
     protected abstract void check(Workbook workbook);
@@ -301,8 +270,7 @@ public abstract class TestCase
      *
      * @return A <code>List</code> of template sheet names.
      */
-    protected List<String> getListOfTemplateSheetNames()
-    {
+    protected List<String> getListOfTemplateSheetNames() {
         return null;
     }
 
@@ -312,8 +280,7 @@ public abstract class TestCase
      *
      * @return A <code>List</code> of result sheet names.
      */
-    protected List<String> getListOfResultSheetNames()
-    {
+    protected List<String> getListOfResultSheetNames() {
         return null;
     }
 
@@ -324,8 +291,7 @@ public abstract class TestCase
      * @return A <code>List</code> of <code>Maps</code> of bean names to bean
      * values.
      */
-    protected List<Map<String, Object>> getListOfBeansMaps()
-    {
+    protected List<Map<String, Object>> getListOfBeansMaps() {
         return null;
     }
 
@@ -335,8 +301,7 @@ public abstract class TestCase
      *
      * @return A <code>Map</code> of bean names to bean values.
      */
-    protected Map<String, Object> getBeansMap()
-    {
+    protected Map<String, Object> getBeansMap() {
         return null;
     }
 }

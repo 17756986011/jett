@@ -45,43 +45,42 @@ import net.sf.jett.util.SheetUtil;
  * @author Randy Gettman
  */
 @Ignore
-public class TestUtility
-{
+public class TestUtility {
     /**
-     * Gets a beans map with <code>State</code> beans "california" and "nevada".
-     * Each bean in turn is composed of many <code>County</code> beans.
+     * 获取带有 <code>State<code> beans "california" 和 "nevada" 的 beans map。
+     * 每个 bean 又由许多 <code>County<code> bean 组成。
      *
      * @return A <code>Map</code> of <code>State</code> beans.
      */
-    public static Map<String, Object> getStateData()
-    {
+    public static Map<String, Object> getStateData() {
         Map<String, Object> beans = new HashMap<>();
-        beans.put("california", getCalifornia());
-        beans.put("nevada", getNevada());
+        beans.put("california", TestUtility.getCalifornia());
+        beans.put("nevada", TestUtility.getNevada());
 
         return beans;
     }
 
     /**
      * Returns a specific state under the given bean name.
+     *
      * @param code A code (currently 0 = California, 1 = Nevada).
      * @param name The bean name to create.
+     *
      * @return A <code>Map</code> of the bean name to the bean value -- the
-     *    <code>State</code>.
+     * <code>State</code>.
+     *
      * @since 0.8.0
      */
-    public static Map<String, Object> getSpecificStateData(int code, String name)
-    {
+    public static Map<String, Object> getSpecificStateData(int code, String name) {
         Map<String, Object> beans = new HashMap<>();
         State state = null;
-        switch(code)
-        {
-        case 0:
-            state = getCalifornia();
-            break;
-        case 1:
-            state = getNevada();
-            break;
+        switch (code) {
+            case 0:
+                state = getCalifornia();
+                break;
+            case 1:
+                state = getNevada();
+                break;
         }
         beans.put(name, state);
         return beans;
@@ -90,11 +89,12 @@ public class TestUtility
     /**
      * Gets a beans map with "counties" referring to a <code>List</code> of all
      * counties in California and in Nevada.
+     *
      * @return A <code>Map</code> of a list of <code>County</code> beans.
+     *
      * @since 0.9.0
      */
-    public static Map<String, Object> getCountyData()
-    {
+    public static Map<String, Object> getCountyData() {
         Map<String, Object> beans = new HashMap<>();
         State california = getCalifornia();
         State nevada = getNevada();
@@ -108,11 +108,12 @@ public class TestUtility
 
     /**
      * Get California state data.
+     *
      * @return A <code>State</code>.
+     *
      * @since 0.8.0
      */
-    private static State getCalifornia()
-    {
+    private static State getCalifornia() {
         State california = new State();
         california.setName("California");
         california.addCounty(new County("Los Angeles", 10363850, 10515, 1850, "Los Angeles", "06037"));
@@ -178,11 +179,12 @@ public class TestUtility
 
     /**
      * Get Nevada state data.
+     *
      * @return A <code>State</code>.
+     *
      * @since 0.8.0
      */
-    private static State getNevada()
-    {
+    private static State getNevada() {
 
         State nevada = new State();
         nevada.setName("Nevada");
@@ -209,12 +211,13 @@ public class TestUtility
     /**
      * Returns some fictional <code>Counties</code> in a collection known as
      * "county", to test a specific part of implicit collections processing.
+     *
      * @return A <code>Map</code> of beans containing a <code>List</code> of
-     *     dummy <code>County</code> objects.
+     * dummy <code>County</code> objects.
+     *
      * @since 0.5.2
      */
-    public static Map<String, Object> getFictionalCountyData()
-    {
+    public static Map<String, Object> getFictionalCountyData() {
         Map<String, Object> beans = new HashMap<>();
         List<County> county = new ArrayList<>();
         county.add(new County("Carburetor", 150, 7089, 2006, "Radiator Springs", "99001"));
@@ -240,11 +243,11 @@ public class TestUtility
     /**
      * Gets a beans map with a <code>List</code> of division beans, most of
      * which contain <code>Team</code> beans.  The name is "divisionsList".
+     *
      * @return A <code>Map</code> of beans containing a <code>List</code> of
-     *    all <code>Divisions</code>.
+     * all <code>Divisions</code>.
      */
-    public static Map<String, Object> getDivisionData()
-    {
+    public static Map<String, Object> getDivisionData() {
         Map<String, Object> beans = new HashMap<>();
         List<Division> divisionsList = new ArrayList<>();
 
@@ -265,53 +268,54 @@ public class TestUtility
     /**
      * Get a beans map with only one <code>Division</code>, determined by the
      * <code>code</code> argument.  The name is "division".
+     *
      * @param code Determines with division, 0-7.
+     *
      * @return A <code>Map</code> of beans, containing a specific
-     *    <code>Division</code>.
+     * <code>Division</code>.
      */
-    public static Map<String, Object> getSpecificDivisionData(int code)
-    {
+    public static Map<String, Object> getSpecificDivisionData(int code) {
         return getSpecificDivisionData(code, "division");
     }
 
     /**
      * Get a beans map with only one <code>Division</code>, determined by the
      * <code>code</code> argument.  It is keyed by the given name.
+     *
      * @param code Determines which division, 0-7.
      * @param name This becomes the bean name of the <code>Division</code>.
+     *
      * @return A <code>Map</code> of beans, containing a specific
-     *    <code>Division</code> with the given name.
+     * <code>Division</code> with the given name.
      */
-    public static Map<String, Object> getSpecificDivisionData(int code, String name)
-    {
+    public static Map<String, Object> getSpecificDivisionData(int code, String name) {
         Map<String, Object> beans = new HashMap<>();
         Division division = null;
-        switch(code)
-        {
-        case 0:
-            division = getAtlanticDivision();
-            break;
-        case 1:
-            division = getCentralDivision();
-            break;
-        case 2:
-            division = getSoutheastDivision();
-            break;
-        case 3:
-            division = getNorthwestDivision();
-            break;
-        case 4:
-            division = getPacificDivision();
-            break;
-        case 5:
-            division = getSouthwestDivision();
-            break;
-        case 6:
-            division = getEmptyDivision();
-            break;
-        case 7:
-            division = getOfTheirOwnDivision();
-            break;
+        switch (code) {
+            case 0:
+                division = getAtlanticDivision();
+                break;
+            case 1:
+                division = getCentralDivision();
+                break;
+            case 2:
+                division = getSoutheastDivision();
+                break;
+            case 3:
+                division = getNorthwestDivision();
+                break;
+            case 4:
+                division = getPacificDivision();
+                break;
+            case 5:
+                division = getSouthwestDivision();
+                break;
+            case 6:
+                division = getEmptyDivision();
+                break;
+            case 7:
+                division = getOfTheirOwnDivision();
+                break;
         }
         beans.put(name, division);
         return beans;
@@ -320,12 +324,13 @@ public class TestUtility
     /**
      * Gets a beans map with a <code>List</code> of 100 dummy division beans,
      * each containing 10 <code>Team</code> beans.  The name is "divisionsList".
+     *
      * @return A <code>Map</code> of beans containing a <code>List</code> of
-     *    100 dummy <code>Divisions</code>.
+     * 100 dummy <code>Divisions</code>.
+     *
      * @since 0.8.0
      */
-    public static Map<String, Object> getDummyDivisionsData()
-    {
+    public static Map<String, Object> getDummyDivisionsData() {
         Map<String, Object> beans = new HashMap<>();
         List<Division> divisionsList = new ArrayList<>(100);
         for (int d = 0; d < 100; d++)
@@ -338,16 +343,17 @@ public class TestUtility
 
     /**
      * Get a dummy <code>Division</code>, with 10 dummy teams.
+     *
      * @param d Determines which dummy "division".
+     *
      * @return A dummy <code>Division</code> with 10 dummy teams.
+     *
      * @since 0.8.0
      */
-    public static Division getDummyDivision(int d)
-    {
+    public static Division getDummyDivision(int d) {
         Division div = new Division();
         div.setName("Division " + (d + 1));
-        for (int t = 0; t < 10; t++)
-        {
+        for (int t = 0; t < 10; t++) {
             Team team = new Team(div);
             team.setCity("City " + (d * 10 + t + 1));
             team.setName("The Team " + (d * 10 + t + 1) + "ers");
@@ -361,12 +367,13 @@ public class TestUtility
     /**
      * Get a beans map with a <code>List</code> of <code>Teams</code> from all
      * <code>Divisions</code>.  The name is "teams".
+     *
      * @return A <code>Map</code> of beans, containing the <code>List</code> of
-     *    <code>Teams</code>.
+     * <code>Teams</code>.
+     *
      * @since 0.3.0
      */
-    public static Map<String, Object> getTeamsData()
-    {
+    public static Map<String, Object> getTeamsData() {
         Map<String, Object> beans = new HashMap<>();
         List<Team> teams = new ArrayList<>();
 
@@ -385,166 +392,256 @@ public class TestUtility
 
     /**
      * Return Atlantic Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getAtlanticDivision()
-    {
+    private static Division getAtlanticDivision() {
         Division atlantic = new Division();
         atlantic.setName("Atlantic");
         Team boston = new Team(atlantic);
-        boston.setCity("Boston"); boston.setName("Celtics"); boston.setWins(51); boston.setLosses(21);
+        boston.setCity("Boston");
+        boston.setName("Celtics");
+        boston.setWins(51);
+        boston.setLosses(21);
         atlantic.addTeam(boston);
         Team phila = new Team(atlantic);
-        phila.setCity("Philadelphia"); phila.setName("76ers"); phila.setWins(37); phila.setLosses(36);
+        phila.setCity("Philadelphia");
+        phila.setName("76ers");
+        phila.setWins(37);
+        phila.setLosses(36);
         atlantic.addTeam(phila);
         Team newYork = new Team(atlantic);
-        newYork.setCity("New York"); newYork.setName("Knicks"); newYork.setWins(35); newYork.setLosses(38);
+        newYork.setCity("New York");
+        newYork.setName("Knicks");
+        newYork.setWins(35);
+        newYork.setLosses(38);
         atlantic.addTeam(newYork);
         Team newJersey = new Team(atlantic);
-        newJersey.setCity("New Jersey"); newJersey.setName("Nets"); newJersey.setWins(23); newJersey.setLosses(49);
+        newJersey.setCity("New Jersey");
+        newJersey.setName("Nets");
+        newJersey.setWins(23);
+        newJersey.setLosses(49);
         atlantic.addTeam(newJersey);
         Team toronto = new Team(atlantic);
-        toronto.setCity("Toronto"); toronto.setName("Raptors"); toronto.setWins(20); toronto.setLosses(53);
+        toronto.setCity("Toronto");
+        toronto.setName("Raptors");
+        toronto.setWins(20);
+        toronto.setLosses(53);
         atlantic.addTeam(toronto);
         return atlantic;
     }
 
     /**
      * Return Central Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getCentralDivision()
-    {
+    private static Division getCentralDivision() {
         Division central = new Division();
         central.setName("Central");
         Team chicago = new Team(central);
-        chicago.setCity("Chicago"); chicago.setName("Bulls"); chicago.setWins(53); chicago.setLosses(19);
+        chicago.setCity("Chicago");
+        chicago.setName("Bulls");
+        chicago.setWins(53);
+        chicago.setLosses(19);
         central.addTeam(chicago);
         Team indiana = new Team(central);
-        indiana.setCity("Indiana"); indiana.setName("Pacers"); indiana.setWins(32); indiana.setLosses(42);
+        indiana.setCity("Indiana");
+        indiana.setName("Pacers");
+        indiana.setWins(32);
+        indiana.setLosses(42);
         central.addTeam(indiana);
         Team milwaukee = new Team(central);
-        milwaukee.setCity("Milwaukee"); milwaukee.setName("Bucks"); milwaukee.setWins(29); milwaukee.setLosses(43);
+        milwaukee.setCity("Milwaukee");
+        milwaukee.setName("Bucks");
+        milwaukee.setWins(29);
+        milwaukee.setLosses(43);
         central.addTeam(milwaukee);
         Team detroit = new Team(central);
-        detroit.setCity("Detroit"); detroit.setName("Pistons"); detroit.setWins(26); detroit.setLosses(47);
+        detroit.setCity("Detroit");
+        detroit.setName("Pistons");
+        detroit.setWins(26);
+        detroit.setLosses(47);
         central.addTeam(detroit);
         Team cleveland = new Team(central);
-        cleveland.setCity("Cleveland"); cleveland.setName("Cavaliers"); cleveland.setWins(14); cleveland.setLosses(58);
+        cleveland.setCity("Cleveland");
+        cleveland.setName("Cavaliers");
+        cleveland.setWins(14);
+        cleveland.setLosses(58);
         central.addTeam(cleveland);
         return central;
     }
 
     /**
      * Return Southeast Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getSoutheastDivision()
-    {
+    private static Division getSoutheastDivision() {
         Division southeast = new Division();
         southeast.setName("Southeast");
         Team miami = new Team(southeast);
-        miami.setCity("Miami"); miami.setName("Heat"); miami.setWins(51); miami.setLosses(22);
+        miami.setCity("Miami");
+        miami.setName("Heat");
+        miami.setWins(51);
+        miami.setLosses(22);
         southeast.addTeam(miami);
         Team orlando = new Team(southeast);
-        orlando.setCity("Orlando"); orlando.setName("Magic"); orlando.setWins(47); orlando.setLosses(26);
+        orlando.setCity("Orlando");
+        orlando.setName("Magic");
+        orlando.setWins(47);
+        orlando.setLosses(26);
         southeast.addTeam(orlando);
         Team atlanta = new Team(southeast);
-        atlanta.setCity("Atlanta"); atlanta.setName("Hawks"); atlanta.setWins(42); atlanta.setLosses(32);
+        atlanta.setCity("Atlanta");
+        atlanta.setName("Hawks");
+        atlanta.setWins(42);
+        atlanta.setLosses(32);
         southeast.addTeam(atlanta);
         Team charlotte = new Team(southeast);
-        charlotte.setCity("Charlotte"); charlotte.setName("Bobcats"); charlotte.setWins(30); charlotte.setLosses(42);
+        charlotte.setCity("Charlotte");
+        charlotte.setName("Bobcats");
+        charlotte.setWins(30);
+        charlotte.setLosses(42);
         southeast.addTeam(charlotte);
         Team wash = new Team(southeast);
-        wash.setCity("Washington"); wash.setName("Wizards"); wash.setWins(17); wash.setLosses(55);
+        wash.setCity("Washington");
+        wash.setName("Wizards");
+        wash.setWins(17);
+        wash.setLosses(55);
         southeast.addTeam(wash);
         return southeast;
     }
 
     /**
      * Return Northwest Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getNorthwestDivision()
-    {
+    private static Division getNorthwestDivision() {
         Division northwest = new Division();
         northwest.setName("Northwest");
         Team okCity = new Team(northwest);
-        okCity.setCity("Oklahoma City"); okCity.setName("Thunder"); okCity.setWins(48); okCity.setLosses(24);
+        okCity.setCity("Oklahoma City");
+        okCity.setName("Thunder");
+        okCity.setWins(48);
+        okCity.setLosses(24);
         northwest.addTeam(okCity);
         Team denver = new Team(northwest);
-        denver.setCity("Denver"); denver.setName("Nuggets"); denver.setWins(44); denver.setLosses(29);
+        denver.setCity("Denver");
+        denver.setName("Nuggets");
+        denver.setWins(44);
+        denver.setLosses(29);
         northwest.addTeam(denver);
         Team portland = new Team(northwest);
-        portland.setCity("Portland"); portland.setName("Trailblazers"); portland.setWins(42); portland.setLosses(31);
+        portland.setCity("Portland");
+        portland.setName("Trailblazers");
+        portland.setWins(42);
+        portland.setLosses(31);
         northwest.addTeam(portland);
         Team utah = new Team(northwest);
-        utah.setCity("Utah"); utah.setName("Jazz"); utah.setWins(36); utah.setLosses(38);
+        utah.setCity("Utah");
+        utah.setName("Jazz");
+        utah.setWins(36);
+        utah.setLosses(38);
         northwest.addTeam(utah);
         Team minnesota = new Team(northwest);
-        minnesota.setCity("Minnesota"); minnesota.setName("Timberwolves"); minnesota.setWins(17); minnesota.setLosses(57);
+        minnesota.setCity("Minnesota");
+        minnesota.setName("Timberwolves");
+        minnesota.setWins(17);
+        minnesota.setLosses(57);
         northwest.addTeam(minnesota);
         return northwest;
     }
 
     /**
      * Return Pacific Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getPacificDivision()
-    {
+    private static Division getPacificDivision() {
         Division pacific = new Division();
         pacific.setName("Pacific");
         Team lal = new Team(pacific);
-        lal.setCity("Los Angeles"); lal.setName("Lakers"); lal.setWins(53); lal.setLosses(20);
+        lal.setCity("Los Angeles");
+        lal.setName("Lakers");
+        lal.setWins(53);
+        lal.setLosses(20);
         pacific.addTeam(lal);
         Team phoenix = new Team(pacific);
-        phoenix.setCity("Phoenix"); phoenix.setName("Suns"); phoenix.setWins(36); phoenix.setLosses(36);
+        phoenix.setCity("Phoenix");
+        phoenix.setName("Suns");
+        phoenix.setWins(36);
+        phoenix.setLosses(36);
         pacific.addTeam(phoenix);
         Team gState = new Team(pacific);
-        gState.setCity("Golden State"); gState.setName("Warriors"); gState.setWins(32); gState.setLosses(42);
+        gState.setCity("Golden State");
+        gState.setName("Warriors");
+        gState.setWins(32);
+        gState.setLosses(42);
         pacific.addTeam(gState);
         Team lac = new Team(pacific);
-        lac.setCity("Los Angeles"); lac.setName("Clippers"); lac.setWins(29); lac.setLosses(45);
+        lac.setCity("Los Angeles");
+        lac.setName("Clippers");
+        lac.setWins(29);
+        lac.setLosses(45);
         pacific.addTeam(lac);
         Team sacramento = new Team(pacific);
-        sacramento.setCity("Sacramento"); sacramento.setName("Kings"); sacramento.setWins(20); sacramento.setLosses(52);
+        sacramento.setCity("Sacramento");
+        sacramento.setName("Kings");
+        sacramento.setWins(20);
+        sacramento.setLosses(52);
         pacific.addTeam(sacramento);
         return pacific;
     }
 
     /**
      * Return Southwest Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getSouthwestDivision()
-    {
+    private static Division getSouthwestDivision() {
         Division southwest = new Division();
         southwest.setName("Southwest");
         Team sanAnt = new Team(southwest);
-        sanAnt.setCity("San Antonio"); sanAnt.setName("Spurs"); sanAnt.setWins(57); sanAnt.setLosses(16);
+        sanAnt.setCity("San Antonio");
+        sanAnt.setName("Spurs");
+        sanAnt.setWins(57);
+        sanAnt.setLosses(16);
         southwest.addTeam(sanAnt);
         Team dallas = new Team(southwest);
-        dallas.setCity("Dallas"); dallas.setName("Mavericks"); dallas.setWins(52); dallas.setLosses(21);
+        dallas.setCity("Dallas");
+        dallas.setName("Mavericks");
+        dallas.setWins(52);
+        dallas.setLosses(21);
         southwest.addTeam(dallas);
         Team newOrl = new Team(southwest);
-        newOrl.setCity("New Orleans"); newOrl.setName("Hornets"); newOrl.setWins(42); newOrl.setLosses(32);
+        newOrl.setCity("New Orleans");
+        newOrl.setName("Hornets");
+        newOrl.setWins(42);
+        newOrl.setLosses(32);
         southwest.addTeam(newOrl);
         Team memphis = new Team(southwest);
-        memphis.setCity("Memphis"); memphis.setName("Grizzlies"); memphis.setWins(41); memphis.setLosses(33);
+        memphis.setCity("Memphis");
+        memphis.setName("Grizzlies");
+        memphis.setWins(41);
+        memphis.setLosses(33);
         southwest.addTeam(memphis);
         Team houston = new Team(southwest);
-        houston.setCity("Houston"); houston.setName("Rockets"); houston.setWins(38); houston.setLosses(35);
+        houston.setCity("Houston");
+        houston.setName("Rockets");
+        houston.setWins(38);
+        houston.setLosses(35);
         southwest.addTeam(houston);
         return southwest;
     }
 
     /**
      * Return Empty Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getEmptyDivision()
-    {
+    private static Division getEmptyDivision() {
         Division empty = new Division();
         empty.setName("Empty");
         return empty;
@@ -552,14 +649,17 @@ public class TestUtility
 
     /**
      * Return Of Their Own Division statistics.
+     *
      * @return A <code>Division</code>.
      */
-    private static Division getOfTheirOwnDivision()
-    {
+    private static Division getOfTheirOwnDivision() {
         Division ofTheirOwn = new Division();
         ofTheirOwn.setName("Of Their Own");
         Team harlem = new Team(ofTheirOwn);
-        harlem.setCity("Harlem"); harlem.setName("Globetrotters"); harlem.setWins(21227); harlem.setLosses(341);
+        harlem.setCity("Harlem");
+        harlem.setName("Globetrotters");
+        harlem.setWins(21227);
+        harlem.setLosses(341);
         ofTheirOwn.addTeam(harlem);
         return ofTheirOwn;
     }
@@ -570,8 +670,7 @@ public class TestUtility
      *
      * @return A <code>Map</code> of <code>HyperlinkData</code> beans.
      */
-    public static Map<String, Object> getHyperlinkData()
-    {
+    public static Map<String, Object> getHyperlinkData() {
         Map<String, Object> beans = new HashMap<>();
         List<HyperlinkData> hyperlinks = new ArrayList<>();
         hyperlinks.add(new HyperlinkData(
@@ -588,23 +687,25 @@ public class TestUtility
 
     /**
      * Gets a beans map with <code>Employee</code> data, exposed as "employees".
+     *
      * @return A <code>Map</code> of <code>Employee</code> beans.
+     *
      * @since 0.3.0
      */
-    public static Map<String, Object> getEmployeeData()
-    {
+    public static Map<String, Object> getEmployeeData() {
         Map<String, Object> beans = new HashMap<>();
-        beans.put("employees", getEmployees());
+        beans.put("employees", TestUtility.getEmployees());
         return beans;
     }
 
     /**
      * Returns a <code>List</code> of <code>Employees</code>.
+     *
      * @return A <code>List</code> of <code>Employees</code>.
+     *
      * @since 0.6.0
      */
-    public static List<Employee> getEmployees()
-    {
+    public static List<Employee> getEmployees() {
         Employee robert = new Employee();
         robert.setFirstName("Robert");
         robert.setLastName("Stack");
@@ -636,11 +737,12 @@ public class TestUtility
 
     /**
      * Gets a beans map with <code>Element</code> data, exposed as "elements".
+     *
      * @return A <code>Map</code> of <code>Element</code> beans.
+     *
      * @since 0.9.1
      */
-    public static Map<String, Object> getElementData()
-    {
+    public static Map<String, Object> getElementData() {
         Map<String, Object> beans = new HashMap<>();
         beans.put("elements", getElements());
         return beans;
@@ -648,11 +750,12 @@ public class TestUtility
 
     /**
      * Returns a <code>List</code> of <code>Elements</code>.
+     *
      * @return A <code>List</code> of <code>Elements</code>.
+     *
      * @since 0.9.1
      */
-    public static List<Element> getElements()
-    {
+    public static List<Element> getElements() {
         List<Element> elements = new ArrayList<>();
         List<Element> subElements1 = new ArrayList<>();
         List<Element> subElements2 = new ArrayList<>();
@@ -667,11 +770,12 @@ public class TestUtility
 
     /**
      * Gets a beans map with <code>WorkOrder</code> data, exposed as "workOrders".
+     *
      * @return A <code>Map</code> of <code>WorkOrder</code> beans.
+     *
      * @since 0.10.0
      */
-    public static Map<String, Object> getWorkOrderData()
-    {
+    public static Map<String, Object> getWorkOrderData() {
         Map<String, Object> beans = new HashMap<>();
         beans.put("workOrders", getWorkOrders());
         return beans;
@@ -679,11 +783,12 @@ public class TestUtility
 
     /**
      * Returns a <code>List</code> of <code>WorkOrders</code>.
+     *
      * @return A <code>List</code> of <code>WorkOrders</code>.
+     *
      * @since 0.10.0
      */
-    public static List<WorkOrder> getWorkOrders()
-    {
+    public static List<WorkOrder> getWorkOrders() {
         List<WorkOrder> workOrders = new ArrayList<>();
         // Must have at least 2 work orders with the same department, location,
         // and installation for this particular test to test its target issue
@@ -703,11 +808,12 @@ public class TestUtility
     /**
      * Gets a beans map with <code>Region</code> data, exposed as "regions".
      * Also exposes "dates" as the list of dates.
+     *
      * @return A <code>Map</code> of <code>Region</code> beans and date strings.
+     *
      * @since 0.10.0
      */
-    public static Map<String, Object> getRegionSalesData()
-    {
+    public static Map<String, Object> getRegionSalesData() {
         Map<String, Object> beans = new HashMap<>();
         beans.put("regions", getRegions());
         beans.put("dates", Arrays.asList("1/1/2015", "2/1/2015", "3/1/2015"));
@@ -716,11 +822,12 @@ public class TestUtility
 
     /**
      * Returns a <code>List</code> of <code>Regions</code>.
+     *
      * @return A <code>List</code> of <code>Regions</code>.
+     *
      * @since 0.10.0
      */
-    public static List<Region> getRegions()
-    {
+    public static List<Region> getRegions() {
         List<Region> regions = new ArrayList<>();
         regions.add(new Region("USA", Arrays.asList(50, 51, 52)));
         regions.add(new Region("ASIA", Arrays.asList(25, 26, 27)));
@@ -731,19 +838,20 @@ public class TestUtility
     /**
      * Gets the string value from a particular <code>Cell</code> on the given
      * <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The string value, as a <code>String</code>.
      */
-    public static String getStringCellValue(Sheet sheet, int row, int col)
-    {
+    public static String getStringCellValue(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getStringCellValue();
+            }
         }
         return null;
     }
@@ -751,20 +859,22 @@ public class TestUtility
     /**
      * Gets the boolean value from a particular <code>Cell</code> on the given
      * <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The boolean value.
+     *
      * @since 0.4.0
      */
-    public static boolean getBooleanCellValue(Sheet sheet, int row, int col)
-    {
+    public static boolean getBooleanCellValue(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getBooleanCellValue();
+            }
         }
         return false;
     }
@@ -772,20 +882,22 @@ public class TestUtility
     /**
      * Gets the <code>RichTextString</code> value from a particular
      * <code>Cell</code> on the given <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The <code>RichTextStringValue</code>.
+     *
      * @since 0.2.0
      */
-    public static RichTextString getRichTextStringCellValue(Sheet sheet, int row, int col)
-    {
+    public static RichTextString getRichTextStringCellValue(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getRichStringCellValue();
+            }
         }
         return null;
     }
@@ -793,19 +905,20 @@ public class TestUtility
     /**
      * Gets the numeric value from a particular <code>Cell</code> on the given
      * <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The numeric value, as a <code>double</code>.
      */
-    public static double getNumericCellValue(Sheet sheet, int row, int col)
-    {
+    public static double getNumericCellValue(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getNumericCellValue();
+            }
         }
         return Double.NaN;
     }
@@ -813,19 +926,18 @@ public class TestUtility
     /**
      * Gets the string formula value from a particular <code>Cell</code> on the
      * given <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The string formula value.
      */
-    public static String getFormulaCellValue(Sheet sheet, int row, int col)
-    {
+    public static String getFormulaCellValue(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 // The HSSF Formula Parser strips whitespaces outside of strings, but the
                 // XSSF Formula Parser does not.
                 // Just lose the spaces in all strings for comparison purposes.
@@ -839,33 +951,36 @@ public class TestUtility
      * Determines whether the <code>Cell</code> on the given <code>Sheet</code>
      * at the given row and column indexes is blank: either it doesn't exist, or
      * it exists and the cell type is blank.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return Whether the <code>Cell</code> is blank.
      */
-    public static boolean isCellBlank(Sheet sheet, int row, int col)
-    {
+    public static boolean isCellBlank(Sheet sheet, int row, int col) {
         return SheetUtil.isCellBlank(sheet, row, col);
     }
 
     /**
      * Gets the <code>Comment</code> value, if any, from a particular
      * <code>Cell</code> on the given <code>Sheet</code>.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The string formula value.
+     *
      * @since 0.2.0
      */
-    public static Comment getComment(Sheet sheet, int row, int col)
-    {
+    public static Comment getComment(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getCellComment();
+            }
         }
         return null;
     }
@@ -873,22 +988,21 @@ public class TestUtility
     /**
      * Determines whether the <code>CellRangeAddress</code>, representing a
      * "merged region", exists in the given <code>Sheet</code>.
-     * @param sheet The <code>Sheet</code>.
+     *
+     * @param sheet  The <code>Sheet</code>.
      * @param region A <code>CellRangeAddress</code>.
+     *
      * @return <code>true</code> if the given region exists in the given sheet,
-     *    <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      */
-    public static boolean isMergedRegionPresent(Sheet sheet, CellRangeAddress region)
-    {
+    public static boolean isMergedRegionPresent(Sheet sheet, CellRangeAddress region) {
         int numMergedRegions = sheet.getNumMergedRegions();
-        for (int i = 0; i < numMergedRegions; i++)
-        {
+        for (int i = 0; i < numMergedRegions; i++) {
             CellRangeAddress candidate = sheet.getMergedRegion(i);
             if (candidate.getFirstRow() == region.getFirstRow() &&
                     candidate.getLastRow() == region.getLastRow() &&
                     candidate.getFirstColumn() == region.getFirstColumn() &&
-                    candidate.getLastColumn() == region.getLastColumn())
-            {
+                    candidate.getLastColumn() == region.getLastColumn()) {
                 return true;
             }
         }
@@ -898,20 +1012,18 @@ public class TestUtility
     /**
      * Helper method to get an actual <code>Font</code>, regardless of which
      * kind of <code>Workbook</code> it came from.
-     * @param result The result of a call to
-     *    <code>RichTextStringUtil.getFontAtIndex</code>.
+     *
+     * @param result   The result of a call to
+     *                 <code>RichTextStringUtil.getFontAtIndex</code>.
      * @param workbook A <code>Workbook</code>.
+     *
      * @return A <code>Font</code>.
      */
-    public static Font convertToFont(Object result, Workbook workbook)
-    {
+    public static Font convertToFont(Object result, Workbook workbook) {
         Font font;
-        if (workbook instanceof HSSFWorkbook)
-        {
+        if (workbook instanceof HSSFWorkbook) {
             font = workbook.getFontAt((Short) result);
-        }
-        else
-        {
+        } else {
             font = (XSSFFont) result;
         }
         return font;
@@ -920,20 +1032,20 @@ public class TestUtility
     /**
      * Returns the cell foreground color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell foreground color, as a hex string.
+     *
      * @since 0.2.0
      */
-    public static String getCellForegroundColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellForegroundColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 Color color = c.getCellStyle().getFillForegroundColorColor();
                 return SheetUtil.getColorHexString(color);
             }
@@ -944,20 +1056,20 @@ public class TestUtility
     /**
      * Returns the cell background color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell background color, as a hex string.
+     *
      * @since 0.4.0
      */
-    public static String getCellBackgroundColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellBackgroundColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 Color color = c.getCellStyle().getFillBackgroundColorColor();
                 return SheetUtil.getColorHexString(color);
             }
@@ -968,20 +1080,20 @@ public class TestUtility
     /**
      * Returns the cell fill pattern on the given <code>Sheet</code>, at the
      * given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell fill pattern.
+     *
      * @since 0.3.0
      */
-    public static short getCellFillPattern(Sheet sheet, int row, int col)
-    {
+    public static short getCellFillPattern(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 return c.getCellStyle().getFillPattern();
             }
         }
@@ -991,24 +1103,20 @@ public class TestUtility
     /**
      * Returns the font color, as a hex string, on the given
      * <code>Font</code>.
+     *
      * @param workbook The <code>Workbook</code> on which the <code>Font</code>
-     *    is found.
-     * @param font A <code>Font</code>.
+     *                 is found.
+     * @param font     A <code>Font</code>.
+     *
      * @return The font color, as a hex string.
      */
-    public static String getFontColorString(Workbook workbook, Font font)
-    {
+    public static String getFontColorString(Workbook workbook, Font font) {
         Color color;
-        if (font instanceof HSSFFont)
-        {
+        if (font instanceof HSSFFont) {
             color = ((HSSFFont) font).getHSSFColor((HSSFWorkbook) workbook);
-        }
-        else if (font instanceof XSSFFont)
-        {
+        } else if (font instanceof XSSFFont) {
             color = ((XSSFFont) font).getXSSFColor();
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException("Unexpected type of Font: " + font.getClass().getName());
         }
         return SheetUtil.getColorHexString(color);
@@ -1017,32 +1125,27 @@ public class TestUtility
     /**
      * Returns the cell bottom border color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell bottom border color, as a hex string.
+     *
      * @since 0.4.0
      */
-    public static String getCellBottomBorderColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellBottomBorderColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 CellStyle cs = c.getCellStyle();
                 Color color;
-                if (cs instanceof HSSFCellStyle)
-                {
+                if (cs instanceof HSSFCellStyle) {
                     color = ExcelColor.getHssfColorByIndex(cs.getBottomBorderColor());
-                }
-                else if (cs instanceof XSSFCellStyle)
-                {
+                } else if (cs instanceof XSSFCellStyle) {
                     color = ((XSSFCellStyle) cs).getBottomBorderXSSFColor();
-                }
-                else
-                {
+                } else {
                     throw new IllegalArgumentException("Unexpected type of CellStyle for cell on sheet " +
                             sheet.getSheetName() + ", row " + row + ", col " + col);
                 }
@@ -1055,32 +1158,27 @@ public class TestUtility
     /**
      * Returns the cell left border color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell left border color, as a hex string.
+     *
      * @since 0.4.0
      */
-    public static String getCellLeftBorderColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellLeftBorderColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 CellStyle cs = c.getCellStyle();
                 Color color;
-                if (cs instanceof HSSFCellStyle)
-                {
+                if (cs instanceof HSSFCellStyle) {
                     color = ExcelColor.getHssfColorByIndex(cs.getLeftBorderColor());
-                }
-                else if (cs instanceof XSSFCellStyle)
-                {
+                } else if (cs instanceof XSSFCellStyle) {
                     color = ((XSSFCellStyle) cs).getLeftBorderXSSFColor();
-                }
-                else
-                {
+                } else {
                     throw new IllegalArgumentException("Unexpected type of CellStyle for cell on sheet " +
                             sheet.getSheetName() + ", row " + row + ", col " + col);
                 }
@@ -1093,32 +1191,27 @@ public class TestUtility
     /**
      * Returns the cell right border color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell right border color, as a hex string.
+     *
      * @since 0.4.0
      */
-    public static String getCellRightBorderColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellRightBorderColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 CellStyle cs = c.getCellStyle();
                 Color color;
-                if (cs instanceof HSSFCellStyle)
-                {
+                if (cs instanceof HSSFCellStyle) {
                     color = ExcelColor.getHssfColorByIndex(cs.getRightBorderColor());
-                }
-                else if (cs instanceof XSSFCellStyle)
-                {
+                } else if (cs instanceof XSSFCellStyle) {
                     color = ((XSSFCellStyle) cs).getRightBorderXSSFColor();
-                }
-                else
-                {
+                } else {
                     throw new IllegalArgumentException("Unexpected type of CellStyle for cell on sheet " +
                             sheet.getSheetName() + ", row " + row + ", col " + col);
                 }
@@ -1131,32 +1224,27 @@ public class TestUtility
     /**
      * Returns the cell top border color, as a hex string, on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The cell top border color, as a hex string.
+     *
      * @since 0.4.0
      */
-    public static String getCellTopBorderColorString(Sheet sheet, int row, int col)
-    {
+    public static String getCellTopBorderColorString(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 CellStyle cs = c.getCellStyle();
                 Color color;
-                if (cs instanceof HSSFCellStyle)
-                {
+                if (cs instanceof HSSFCellStyle) {
                     color = ExcelColor.getHssfColorByIndex(cs.getTopBorderColor());
-                }
-                else if (cs instanceof XSSFCellStyle)
-                {
+                } else if (cs instanceof XSSFCellStyle) {
                     color = ((XSSFCellStyle) cs).getTopBorderXSSFColor();
-                }
-                else
-                {
+                } else {
                     throw new IllegalArgumentException("Unexpected type of CellStyle for cell on sheet " +
                             sheet.getSheetName() + ", row " + row + ", col " + col);
                 }
@@ -1168,21 +1256,21 @@ public class TestUtility
 
     /**
      * Returns the <code>Hyperlink</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The <code>Hyperlink</code>, or <code>null</code> if it doesn't
-     *    exist.
+     * exist.
+     *
      * @since 0.5.0
      */
-    public static Hyperlink getHyperlink(Sheet sheet, int row, int col)
-    {
+    public static Hyperlink getHyperlink(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
-            {
+            if (c != null) {
                 return c.getHyperlink();
             }
         }
@@ -1192,37 +1280,41 @@ public class TestUtility
     /**
      * Returns the <code>Cell</code> (if any), on the given <code>Sheet</code>,
      * at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The <code>Cell</code> or <code>null</code> if it doesn't exist.
      */
-    public static Cell getCell(Sheet sheet, int row, int col)
-    {
+    public static Cell getCell(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
+        if (r != null) {
             return r.getCell(col);
+        }
         return null;
     }
 
     /**
      * Returns the <code>CellStyle</code> (if any), on the given
      * <code>Sheet</code>, at the given row and column indexes.
+     *
      * @param sheet The <code>Sheet</code>.
-     * @param row The 0-based row index.
-     * @param col The 0-based column index.
+     * @param row   The 0-based row index.
+     * @param col   The 0-based column index.
+     *
      * @return The <code>CellStyle</code> or <code>null</code> if the cell
-     *    doesn't exist.
+     * doesn't exist.
+     *
      * @since 0.4.0
      */
-    public static CellStyle getCellStyle(Sheet sheet, int row, int col)
-    {
+    public static CellStyle getCellStyle(Sheet sheet, int row, int col) {
         Row r = sheet.getRow(row);
-        if (r != null)
-        {
+        if (r != null) {
             Cell c = r.getCell(col);
-            if (c != null)
+            if (c != null) {
                 return c.getCellStyle();
+            }
         }
         return null;
     }
