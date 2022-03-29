@@ -1,5 +1,10 @@
 package net.sf.jett.test;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -8,11 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -67,7 +67,14 @@ public class AggTagTest extends TestCase {
     protected void check(Workbook workbook) {
         MathContext mc = new MathContext(100, RoundingMode.HALF_EVEN);
 
-        Sheet agg = workbook.getSheetAt(0);
+        Sheet msd = workbook.getSheetAt(0);
+        // 如果 msd，“真”首先出现。如果不是 msd（排序），则首先出现“false”。
+        assertTrue(TestUtility.getBooleanCellValue(msd, 1, 0));
+        assertEquals(2500, TestUtility.getNumericCellValue(msd, 1, 1), DELTA);
+        assertFalse(TestUtility.getBooleanCellValue(msd, 2, 0));
+        assertEquals(1700, TestUtility.getNumericCellValue(msd, 2, 1), DELTA);
+
+        Sheet agg = workbook.getSheetAt(1);
         assertEquals("A", TestUtility.getStringCellValue(agg, 2, 0));
         assertEquals(3, TestUtility.getNumericCellValue(agg, 2, 1), DELTA);
         assertEquals(1582165, TestUtility.getNumericCellValue(agg, 2, 2), DELTA);
@@ -313,13 +320,6 @@ public class AggTagTest extends TestCase {
         bdNvStdDevW = bdNvStdDevW.add(nvW2.subtract(bdNvAvgW, mc).pow(2, mc), mc);
         double nvStdDvW = Math.sqrt(bdNvStdDevW.doubleValue());
         assertEquals(nvStdDvW, TestUtility.getNumericCellValue(agg, 33, 3), DELTA);
-
-        Sheet msd = workbook.getSheetAt(1);
-        // 如果 msd，“真”首先出现。如果不是 msd（排序），则首先出现“false”。
-        assertTrue(TestUtility.getBooleanCellValue(msd, 1, 0));
-        assertEquals(2500, TestUtility.getNumericCellValue(msd, 1, 1), DELTA);
-        assertFalse(TestUtility.getBooleanCellValue(msd, 2, 0));
-        assertEquals(1700, TestUtility.getNumericCellValue(msd, 2, 1), DELTA);
 
         Sheet rollup = workbook.getSheetAt(2);
         List<String> titles = Arrays.asList("Cartoon Character", "Data Structures Programmer", "All Values",

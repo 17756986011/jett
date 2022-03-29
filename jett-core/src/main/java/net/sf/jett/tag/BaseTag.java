@@ -1,18 +1,5 @@
 package net.sf.jett.tag;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-
 import net.sf.jett.event.TagEvent;
 import net.sf.jett.event.TagListener;
 import net.sf.jett.exception.TagParseException;
@@ -20,6 +7,14 @@ import net.sf.jett.model.Block;
 import net.sf.jett.model.WorkbookContext;
 import net.sf.jett.util.AttributeUtil;
 import net.sf.jett.util.SheetUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * <p>The abstract class <code>BaseTag</code> provides common functionality to
@@ -36,7 +31,7 @@ import net.sf.jett.util.SheetUtil;
  */
 public abstract class BaseTag implements Tag
 {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(BaseTag.class);
 
     /**
      * Attribute for specifying a <code>TagListener</code> to listen for
@@ -262,7 +257,7 @@ public abstract class BaseTag implements Tag
         {
             TagContext context = getContext();
             TagEvent tagEvent = new TagEvent(context.getSheet(), context.getBlock(), context.getBeans());
-            logger.debug("fireBeforeTagProcessedEvent: context's Block is {}", getContext().getBlock());
+            logger.info("fireBeforeTagProcessedEvent: context's Block is {}", getContext().getBlock());
             return myTagListener.beforeTagProcessed(tagEvent);
         }
         return true;
@@ -279,7 +274,7 @@ public abstract class BaseTag implements Tag
         {
             TagContext context = getContext();
             TagEvent tagEvent = new TagEvent(context.getSheet(), context.getBlock(), context.getBeans());
-            logger.debug("fireTagProcessedEvent: context's Block is {}", getContext().getBlock());
+            logger.info("fireTagProcessedEvent: context's Block is {}", getContext().getBlock());
             myTagListener.onTagProcessed(tagEvent);
         }
     }
@@ -369,7 +364,7 @@ public abstract class BaseTag implements Tag
         myTagListener = AttributeUtil.evaluateObject(this, attributes.get(ATTR_ON_PROCESSED), beans, ATTR_ON_PROCESSED,
                 TagListener.class, null);
 
-        logger.debug("vA: myTagListener is {}", ((myTagListener != null) ? myTagListener.toString() : " null"));
+        logger.info("vA: myTagListener is {}", ((myTagListener != null) ? myTagListener.toString() : " null"));
     }
 
     /**

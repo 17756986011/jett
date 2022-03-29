@@ -1,19 +1,5 @@
 package net.sf.jett.transform;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-
 import net.sf.jett.exception.TagParseException;
 import net.sf.jett.expression.Expression;
 import net.sf.jett.expression.ExpressionFactory;
@@ -26,6 +12,11 @@ import net.sf.jett.tag.MultiForEachTag;
 import net.sf.jett.tag.TagContext;
 import net.sf.jett.util.RichTextStringUtil;
 import net.sf.jett.util.SheetUtil;
+import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * A <code>CollectionsTransformer</code> knows how to perform implicit
@@ -34,9 +25,8 @@ import net.sf.jett.util.SheetUtil;
  *
  * @author Randy Gettman
  */
-public class CollectionsTransformer
-{
-    private static final Logger logger = LogManager.getLogger();
+public class CollectionsTransformer {
+    private static final Logger logger = LoggerFactory.getLogger(CollectionsTransformer.class);
 
     /**
      * Determines the beginning of metadata text.
@@ -49,13 +39,13 @@ public class CollectionsTransformer
      * Transform a <code>Block</code> of <code>Cells</code> around the given
      * <code>Cell</code>, which has declared implicit collection processing
      * behavior using the given collection expression.
-     * @param cell The <code>Cell</code> on which the collection expression was
-     *    first found.
+     *
+     * @param cell            The <code>Cell</code> on which the collection expression was
+     *                        first found.
      * @param workbookContext The <code>WorkbookContext</code>.
-     * @param cellContext The <code>TagContext</code> of <code>cell</code>.
+     * @param cellContext     The <code>TagContext</code> of <code>cell</code>.
      */
-    public void transform(Cell cell, WorkbookContext workbookContext, TagContext cellContext)
-    {
+    public void transform(Cell cell, WorkbookContext workbookContext, TagContext cellContext) {
         Block parentBlock = cellContext.getBlock();
         Map<String, Object> beans = cellContext.getBeans();
         Map<String, Cell> processedCells = cellContext.getProcessedCellsMap();
@@ -67,11 +57,10 @@ public class CollectionsTransformer
         RichTextString richString = cell.getRichStringCellValue();
         String value = richString.getString();
         int metadataIndIdx = value.indexOf(BEGIN_METADATA);
-        if (metadataIndIdx != -1)
-        {
+        if (metadataIndIdx != -1) {
             // Evaluate any Expressions in the metadata.
             String metadata = value.substring(metadataIndIdx + BEGIN_METADATA.length());
-            logger.debug("  Metadata found: {} on sheet {} at row {}, cell {}",
+            logger.info("  Metadata found: {} on sheet {} at row {}, cell {}",
                     metadata, sheet.getSheetName(), cell.getRowIndex(), cell.getColumnIndex());
             // Parse the Metadata.
             parser = new MetadataParser(metadata);
@@ -100,12 +89,10 @@ public class CollectionsTransformer
         String indexVarName = null;
         String limit = null;
         String varStatusName = null;
-        if (parser != null)
-        {
+        if (parser != null) {
             // Gather parser properties.
             String lexeme = parser.getExtraRows();
-            if (lexeme != null)
-            {
+            if (lexeme != null) {
                 bottom += evaluateInt(lexeme, factory, beans, "extraRows", cell);
             }
 
@@ -121,35 +108,30 @@ public class CollectionsTransformer
             limit = parser.getLimit();
             varStatusName = parser.getVarStatusName();
 
-            if (parser.isDefiningCols())
-            {
+            if (parser.isDefiningCols()) {
                 lexeme = parser.getColsLeft();
-                if (lexeme != null)
-                {
+                if (lexeme != null) {
                     left = cell.getColumnIndex() - evaluateInt(lexeme, factory, beans, "left", cell);
-                }
-                else
-                {
+                } else {
                     left = cell.getColumnIndex();
                 }
                 lexeme = parser.getColsRight();
-                if (lexeme != null)
-                {
+                if (lexeme != null) {
                     right = cell.getColumnIndex() + evaluateInt(lexeme, factory, beans, "right", cell);
-                }
-                else
-                {
+                } else {
                     right = cell.getColumnIndex();
                 }
                 // Column range can't go outside parent's column range.
-                if (left < parentBlock.getLeftColNum())
+                if (left < parentBlock.getLeftColNum()) {
                     left = parentBlock.getLeftColNum();
-                if (right > parentBlock.getRightColNum())
+                }
+                if (right > parentBlock.getRightColNum()) {
                     right = parentBlock.getRightColNum();
+                }
             }
         }
         Block containingBlock = new Block(parentBlock, left, right, top, bottom);
-        logger.debug("Impl MultiForEach Block: {}");
+        logger.info("Impl MultiForEach Block: {}");
 
         // Find all Collection names in the Block.
         List<String> collectionNames = findCollectionsInBlock(cell, containingBlock,
@@ -166,8 +148,7 @@ public class CollectionsTransformer
         SheetUtil.setUpBlockForImplicitCollectionAccess(sheet,
                 containingBlock, collectionNames, vars);
 
-        for (int i = 0; i < collectionNames.size(); i++)
-        {
+        for (int i = 0; i < collectionNames.size(); i++) {
             String collectionName = collectionNames.get(i);
             String varName = vars.get(i);
             // All fixed size collection names that start with this collection
@@ -177,13 +158,12 @@ public class CollectionsTransformer
             // size as well.  E.g.
             // "list1.list2.list3" => "list1" + IMPL_ITEM_NAME_SUFFIX + ".list2.list3".
             List<String> additions = new ArrayList<>();
-            for (String fixedCollName : fixedSizeCollNamesCopy)
-            {
-                if (fixedCollName.startsWith(collectionName))
-                {
+            for (String fixedCollName : fixedSizeCollNamesCopy) {
+                if (fixedCollName.startsWith(collectionName)) {
                     String addition = varName + fixedCollName.substring(collectionName.length());
-                    if (!fixedSizeCollNamesCopy.contains(addition))
+                    if (!fixedSizeCollNamesCopy.contains(addition)) {
                         additions.add(addition);
+                    }
                 }
             }
             fixedSizeCollNames.addAll(additions);
@@ -192,23 +172,24 @@ public class CollectionsTransformer
         // Determine if any of the collection names we found are marked as
         // "fixed".
         // Remove all collection names not found.
-        for (Iterator<String> itr = fixedSizeCollNamesCopy.iterator(); itr.hasNext(); )
-        {
+        for (Iterator<String> itr = fixedSizeCollNamesCopy.iterator(); itr.hasNext(); ) {
             String fixedSizeCollName = itr.next();
-            logger.debug("  fixed size collection name: {}", fixedSizeCollName);
-            if (!collectionNames.contains(fixedSizeCollName))
+            logger.info("  fixed size collection name: {}", fixedSizeCollName);
+            if (!collectionNames.contains(fixedSizeCollName)) {
                 itr.remove();
+            }
         }
-        if (!fixedSizeCollNamesCopy.isEmpty())
+        if (!fixedSizeCollNamesCopy.isEmpty()) {
             fixed = "true";
-        if (logger.isDebugEnabled())
-        {
-            if (!fixedSizeCollNamesCopy.isEmpty())
-                logger.debug("Setting implicit tag to fixed: {} based on fixed size collection name: {}",
+        }
+        if (logger.isDebugEnabled()) {
+            if (!fixedSizeCollNamesCopy.isEmpty()) {
+                logger.info("Setting implicit tag to fixed: {} based on fixed size collection name: {}",
                         fixed, fixedSizeCollNamesCopy.get(0));
-            else
-                logger.debug("Setting implicit tag to fixed: {} based on no fixed size collection names found.",
+            } else {
+                logger.info("Setting implicit tag to fixed: {} based on no fixed size collection names found.",
                         fixed);
+            }
         }
 
         TagContext context = new TagContext();
@@ -230,10 +211,10 @@ public class CollectionsTransformer
         Map<String, RichTextString> attributes = new HashMap<>();
         StringBuilder buf = new StringBuilder();
         // Construct the attributes.
-        for (int i = 0; i < collectionNames.size(); i++)
-        {
-            if (i > 0)
+        for (int i = 0; i < collectionNames.size(); i++) {
+            if (i > 0) {
                 buf.append(MultiForEachTag.SPEC_SEP);
+            }
             buf.append(Expression.BEGIN_EXPR);
             buf.append(collectionNames.get(i));
             buf.append(Expression.END_EXPR);
@@ -241,40 +222,49 @@ public class CollectionsTransformer
         attributes.put(MultiForEachTag.ATTR_COLLECTIONS, helper.createRichTextString(buf.toString()));
 
         buf.setLength(0);
-        for (int i = 0; i < vars.size(); i++)
-        {
-            if (i > 0)
+        for (int i = 0; i < vars.size(); i++) {
+            if (i > 0) {
                 buf.append(MultiForEachTag.SPEC_SEP);
+            }
             buf.append(vars.get(i));
         }
         attributes.put(MultiForEachTag.ATTR_VARS, helper.createRichTextString(buf.toString()));
-        if (copyRight != null)
+        if (copyRight != null) {
             attributes.put(BaseLoopTag.ATTR_COPY_RIGHT, helper.createRichTextString(copyRight));
-        if (fixed != null)
+        }
+        if (fixed != null) {
             attributes.put(BaseLoopTag.ATTR_FIXED, helper.createRichTextString(fixed));
-        if (pastEndAction != null)
+        }
+        if (pastEndAction != null) {
             attributes.put(BaseLoopTag.ATTR_PAST_END_ACTION, helper.createRichTextString(pastEndAction));
-        if (replacementValue != null)
+        }
+        if (replacementValue != null) {
             attributes.put(BaseLoopTag.ATTR_REPLACE_VALUE, helper.createRichTextString(replacementValue));
-        if (groupDir != null)
+        }
+        if (groupDir != null) {
             attributes.put(BaseLoopTag.ATTR_GROUP_DIR, helper.createRichTextString(groupDir));
-        if (collapse != null)
+        }
+        if (collapse != null) {
             attributes.put(BaseLoopTag.ATTR_COLLAPSE, helper.createRichTextString(collapse));
-        if (tagLoopListener != null)
+        }
+        if (tagLoopListener != null) {
             attributes.put(BaseLoopTag.ATTR_ON_LOOP_PROCESSED, helper.createRichTextString(tagLoopListener));
-        if (tagListener != null)
+        }
+        if (tagListener != null) {
             attributes.put(BaseTag.ATTR_ON_PROCESSED, helper.createRichTextString(tagListener));
-        if (indexVarName != null)
+        }
+        if (indexVarName != null) {
             attributes.put(MultiForEachTag.ATTR_INDEXVAR, helper.createRichTextString(indexVarName));
-        if (limit != null)
+        }
+        if (limit != null) {
             attributes.put(MultiForEachTag.ATTR_LIMIT, helper.createRichTextString(limit));
-        if (varStatusName != null)
+        }
+        if (varStatusName != null) {
             attributes.put(BaseLoopTag.ATTR_VAR_STATUS, helper.createRichTextString(varStatusName));
-        if (logger.isDebugEnabled())
-        {
-            for (String attribute : attributes.keySet())
-            {
-                logger.debug("attr: {} => {}", attribute, attributes.get(attribute));
+        }
+        if (logger.isDebugEnabled()) {
+            for (String attribute : attributes.keySet()) {
+                logger.info("attr: {} => {}", attribute, attributes.get(attribute));
             }
         }
         tag.setAttributes(attributes);
@@ -288,16 +278,17 @@ public class CollectionsTransformer
     /**
      * Creates a <code>List</code> of substitute variable names, one for each of
      * the given collection names.
+     *
      * @param collectionNames A <code>List</code> of collection names.
+     *
      * @return A <code>List</code> of substitute variable names, each related to
-     *    the corresponding collection name.
+     * the corresponding collection name.
+     *
      * @since 0.9.1
      */
-    public static List<String> getImplicitVarNames(List<String> collectionNames)
-    {
+    public static List<String> getImplicitVarNames(List<String> collectionNames) {
         List<String> varNames = new ArrayList<>(collectionNames.size());
-        for (String collectionName : collectionNames)
-        {
+        for (String collectionName : collectionNames) {
             logger.trace("  collection name found: {}", collectionName);
             // Create name under which the items for this Collection will be known.
             String varName = collectionName.replaceAll("\\.", "_");
@@ -310,34 +301,28 @@ public class CollectionsTransformer
     /**
      * Evaluates the given expression, given the <code>Map</code> of bean names
      * to bean values, expecting an integer value for the given key.
-     * @param lexeme The expression.
+     *
+     * @param lexeme  The expression.
      * @param factory An <code>ExpressionFactory</code>.
-     * @param beans A <code>Map</code> of bean names to bean values.
+     * @param beans   A <code>Map</code> of bean names to bean values.
      * @param keyName The key name.
-     * @param cell The <code>Cell</code> on which the metadata is found.
+     * @param cell    The <code>Cell</code> on which the metadata is found.
+     *
      * @return The integer value.
      */
-    private int evaluateInt(String lexeme, ExpressionFactory factory, Map<String, Object> beans, String keyName, Cell cell)
-    {
+    private int evaluateInt(String lexeme, ExpressionFactory factory, Map<String, Object> beans, String keyName, Cell cell) {
         Object obj = Expression.evaluateString(lexeme, factory, beans);
         int change;
-        if (obj instanceof Number)
-        {
+        if (obj instanceof Number) {
             change = ((Number) obj).intValue();
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 change = Integer.parseInt(obj.toString());
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 throw new TagParseException("Metadata key \"" + keyName + "\" needs to be a non-negative integer: " + lexeme
                         + SheetUtil.getCellLocation(cell));
             }
-            if (change < 0)
-            {
+            if (change < 0) {
                 throw new TagParseException("Metadata key \"" + keyName + "\" needs to be a non-negative integer: " + lexeme
                         + SheetUtil.getCellLocation(cell));
             }
@@ -351,18 +336,18 @@ public class CollectionsTransformer
      * <code>Collections</code> in the given ignore list.
      *
      * @param startTag The <code>Cell</code> where the first
-     *    <code>Collection</code> was found.
-     * @param block The <code>Block</code> that was determined by the parent
-     *    <code>Block</code> and any metadata found on <code>startTag</code>.
-     * @param context A <code>WorkbookContext</code>, which refers to an
-     *    <code>ExpressionFactory</code> and a <code>List</code> of collection
-     *    names to ignore.
-     * @param beans The <code>Map</code> of beans.
+     *                 <code>Collection</code> was found.
+     * @param block    The <code>Block</code> that was determined by the parent
+     *                 <code>Block</code> and any metadata found on <code>startTag</code>.
+     * @param context  A <code>WorkbookContext</code>, which refers to an
+     *                 <code>ExpressionFactory</code> and a <code>List</code> of collection
+     *                 names to ignore.
+     * @param beans    The <code>Map</code> of beans.
+     *
      * @return A <code>List</code> of all <code>Collection</code> names found.
      */
     private List<String> findCollectionsInBlock(Cell startTag, Block block,
-                                                WorkbookContext context, Map<String, Object> beans)
-    {
+                                                WorkbookContext context, Map<String, Object> beans) {
         ExpressionFactory factory = context.getExpressionFactory();
         int startColumnIndex = startTag.getColumnIndex();
         int startRowIndex = startTag.getRowIndex();
@@ -385,50 +370,44 @@ public class CollectionsTransformer
         Row startRow = startTag.getRow();
         int startCellNum = startColumnIndex;
         int endCellNum = right;
-        for (int cellNum = startCellNum; cellNum <= endCellNum; cellNum++)
-        {
+        for (int cellNum = startCellNum; cellNum <= endCellNum; cellNum++) {
             logger.trace("  Trying same row: row {}, col {}", startRowIndex, cellNum);
             // First, check remaining Cells in the same row.
             Cell cell = startRow.getCell(cellNum);
-            if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING)
-            {
+            if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                 RichTextString richString = cell.getRichStringCellValue();
                 List<String> collExprs = Expression.getImplicitCollectionExpr(richString.toString(),
                         beans, context);
-                if (!collExprs.isEmpty())
-                {
+                if (!collExprs.isEmpty()) {
                     // Collection Expression(s) found.  Add them if they weren't
                     // already found.
                     for (String collExpr : collExprs)
-                        if (!collectionNames.contains(collExpr))
+                        if (!collectionNames.contains(collExpr)) {
                             collectionNames.add(collExpr);
+                        }
                 }
             }
         }
         // Examine all following rows in the block.
         Sheet sheet = startTag.getSheet();
-        for (int rowNum = startRowIndex + 1; rowNum <= bottom; rowNum++)
-        {
+        for (int rowNum = startRowIndex + 1; rowNum <= bottom; rowNum++) {
             Row row = sheet.getRow(rowNum);
-            if (row != null)
-            {
+            if (row != null) {
                 startCellNum = left;
                 endCellNum = right;
-                for (int cellNum = startCellNum; cellNum <= endCellNum; cellNum++)
-                {
+                for (int cellNum = startCellNum; cellNum <= endCellNum; cellNum++) {
                     Cell cell = row.getCell(cellNum);
-                    if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING)
-                    {
+                    if (cell != null && cell.getCellType() == Cell.CELL_TYPE_STRING) {
                         RichTextString richString = cell.getRichStringCellValue();
                         List<String> collExprs = Expression.getImplicitCollectionExpr(richString.toString(),
                                 beans, context);
-                        if (!collExprs.isEmpty())
-                        {
+                        if (!collExprs.isEmpty()) {
                             // Collection Expression(s) found.  Add them if they weren't
                             // already found.
                             for (String collExpr : collExprs)
-                                if (!collectionNames.contains(collExpr))
+                                if (!collectionNames.contains(collExpr)) {
                                     collectionNames.add(collExpr);
+                                }
                         }
                     }
                 }

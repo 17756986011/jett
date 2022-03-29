@@ -1,33 +1,11 @@
 package net.sf.jett.transform;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Name;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-
 import net.sf.jett.event.CellListener;
 import net.sf.jett.event.SheetListener;
 import net.sf.jett.expression.Expression;
 import net.sf.jett.expression.ExpressionFactory;
 import net.sf.jett.formula.CellRef;
 import net.sf.jett.formula.Formula;
-//import net.sf.jett.lwxssf.LWXSSFWorkbook;
 import net.sf.jett.model.CellStyleCache;
 import net.sf.jett.model.FontCache;
 import net.sf.jett.model.Style;
@@ -37,6 +15,19 @@ import net.sf.jett.tag.JtTagLibrary;
 import net.sf.jett.tag.TagLibrary;
 import net.sf.jett.tag.TagLibraryRegistry;
 import net.sf.jett.util.FormulaUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>The <code>ExcelTransformer</code> class represents the main JETT API.</p>
@@ -96,7 +87,7 @@ import net.sf.jett.util.FormulaUtil;
  * @author Randy Gettman
  */
 public class ExcelTransformer {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(ExcelTransformer.class);
 
     private TagLibraryRegistry myRegistry;
     private List<CellListener> myCellListeners;
@@ -371,7 +362,7 @@ public class ExcelTransformer {
      * 转换由给定 <code>InputStream<code> 表示的模板 Excel 电子表格。
      * 将给定的 <code>Map<code> bean 应用于所有工作表。
      *
-     * @param is    模板电子表格中的 <code>InputStream<code>。
+     * @param inputStream    模板电子表格中的 <code>InputStream<code>。
      * @param beans bean 名称到 bean 对象的 <code>Map<code>。
      *
      * @return 能够写入 <code>OutputStream<code> 的新 <code>Workbook<code> 对象。
@@ -379,10 +370,12 @@ public class ExcelTransformer {
      * @throws IOException            如果读取模板 Excel 电子表格时出现问题。
      * @throws InvalidFormatException 如果创建 <code>Workbook<code> 对象时出现问题。
      */
-    public Workbook transform(InputStream is, Map<String, Object> beans) throws IOException, InvalidFormatException {
-        logger.info("从 InputStream 创建工作簿。");
-        Workbook workbook = WorkbookFactory.create(is);
-        transform(workbook, beans);
+    public Workbook transform(InputStream inputStream, Map<String, Object> beans) throws IOException, InvalidFormatException {
+        logger.info("从 InputStream 中创建工作簿对象 workbook");
+        // 从 InputStream 中创建工作簿对象 workbook
+        Workbook workbook = WorkbookFactory.create(inputStream);
+        // 将给定的数据填充到模板Excel中
+        this.transform(workbook, beans);
         return workbook;
     }
 
@@ -399,18 +392,21 @@ public class ExcelTransformer {
      */
     public void transform(Workbook workbook, Map<String, Object> beans) {
         logger.info("Transforming a Workbook.");
-        // This is done for performance reasons, related to identifying
-        // collection names in expression text, which may vary from beans
-        // map to beans map.
+        // 清空 Expression 中的缓存
         Expression.clearExpressionToCollNamesMap();
+        // Sheet 处理对象
         SheetTransformer sheetTransformer = new SheetTransformer();
-        WorkbookContext context = createContext(workbook, sheetTransformer);
-        exposeWorkbook(beans, workbook);
-        for (int s = 0; s < workbook.getNumberOfSheets(); s++) {
-            Sheet sheet = workbook.getSheetAt(s);
-            sheetTransformer.transform(sheet, context, beans);
+        // 根据 workbook 和 sheetTransformer 创建 workbookContext 对象
+        WorkbookContext workbookContext = this.createContext(workbook, sheetTransformer);
+
+        // 将 workbook 对象放置到数据集合中
+        this.exposeWorkbook(beans, workbook);
+        for (int index = 0; index < workbook.getNumberOfSheets(); index++) {
+            Sheet sheet = workbook.getSheetAt(index);
+            // 使用数据替换掉模板中的表达式
+            sheetTransformer.transform(sheet, workbookContext, beans);
         }
-        postTransformation(workbook, context, sheetTransformer);
+        postTransformation(workbook, workbookContext, sheetTransformer);
         logger.info("Done transforming a Workbook.");
     }
 
@@ -507,16 +503,16 @@ public class ExcelTransformer {
     public void transform(Workbook workbook, List<String> templateSheetNamesList,
                           List<String> newSheetNamesList, List<Map<String, Object>> beansList) {
         logger.info("Transforming a Workbook with Sheet Specific Beans.");
-        logger.debug("templateSheetNamesList.size()={}", templateSheetNamesList.size());
-        logger.debug("newSheetNamesList.size()={}", newSheetNamesList.size());
-        logger.debug("beansList.size()={}", beansList.size());
+        logger.info("templateSheetNamesList.size()={}", templateSheetNamesList.size());
+        logger.info("newSheetNamesList.size()={}", newSheetNamesList.size());
+        logger.info("beansList.size()={}", beansList.size());
         SheetCloner cloner = new SheetCloner(workbook);
         cloner.cloneForSheetSpecificBeans(templateSheetNamesList, newSheetNamesList);
 
         SheetTransformer sheetTransformer = new SheetTransformer();
         WorkbookContext context = createContext(workbook, sheetTransformer, templateSheetNamesList, newSheetNamesList, beansList);
         FormulaUtil.updateSheetNameRefsAfterClone(context);
-        logger.debug("number of Sheets={}", workbook.getNumberOfSheets());
+        logger.info("number of Sheets={}", workbook.getNumberOfSheets());
 
         int numItemsProcessed = 0;
         // Pick up beans list again from the WorkbookContext; implicit cloning
@@ -619,19 +615,19 @@ public class ExcelTransformer {
         context.setExpressionFactory(myExpressionFactory);
         context.setBeansMaps(beansMaps);
 
-        logger.debug("Formula Map:");
+        logger.info("Formula Map:");
         if (logger.isDebugEnabled()) {
             for (String key : formulaMap.keySet()) {
-                logger.debug("  {} => {}", key, formulaMap.get(key));
+                logger.info("  {} => {}", key, formulaMap.get(key));
             }
         }
-        logger.debug("Tag Locations Map:");
+        logger.info("Tag Locations Map:");
         if (logger.isDebugEnabled()) {
             for (String cellRef : tagLocationsMap.keySet()) {
-                logger.debug("  {} => {}", cellRef, tagLocationsMap.get(cellRef));
+                logger.info("  {} => {}", cellRef, tagLocationsMap.get(cellRef));
             }
         }
-        logger.debug("Cell Ref Map:");
+        logger.info("Cell Ref Map:");
         if (logger.isDebugEnabled()) {
             for (String key : cellRefMap.keySet()) {
                 List<CellRef> cellRefs = cellRefMap.get(key);
@@ -642,7 +638,7 @@ public class ExcelTransformer {
                     buf.append(",");
                 }
                 buf.append("]");
-                logger.debug("  {} => {}", key, buf.toString());
+                logger.info("  {} => {}", key, buf.toString());
             }
         }
 
@@ -686,13 +682,13 @@ public class ExcelTransformer {
         Map<String, List<CellRef>> cellRefMap = context.getCellRefMap();
         FormulaUtil.findAndReplaceCellRanges(cellRefMap);
 
-        logger.debug("Formula Map after transformation:");
+        logger.info("Formula Map after transformation:");
         if (logger.isDebugEnabled()) {
             for (String key : formulaMap.keySet()) {
-                logger.debug("  {} => {}", key, formulaMap.get(key));
+                logger.info("  {} => {}", key, formulaMap.get(key));
             }
         }
-        logger.debug("CellRefMap after transformation and cell ranges detected and replaced:");
+        logger.info("CellRefMap after transformation and cell ranges detected and replaced:");
         if (logger.isDebugEnabled()) {
             for (String key : cellRefMap.keySet()) {
                 StringBuilder buf = new StringBuilder();
@@ -703,7 +699,7 @@ public class ExcelTransformer {
                     buf.append(",");
                 }
                 buf.append("]");
-                logger.debug("  {} => {}", key, buf.toString());
+                logger.info("  {} => {}", key, buf.toString());
             }
         }
 
@@ -754,7 +750,7 @@ public class ExcelTransformer {
                     // Replace all original cell references with translated cell references.
                     String excelFormula = FormulaUtil.createExcelFormulaString(formula, sheetName, context);
 
-                    logger.debug("  For named range {}, scope {}, mapped to {}" +
+                    logger.info("  For named range {}, scope {}, mapped to {}" +
                                     ", replacing formula \"{}\" with \"{}\".",
                             namedRangeName, "".equals(scopeSheetName) ? "workbook" : ("\"" + scopeSheetName + "\""),
                             formula, formula.getFormulaText(), excelFormula);

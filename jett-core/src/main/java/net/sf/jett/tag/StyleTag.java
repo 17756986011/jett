@@ -1,37 +1,24 @@
 package net.sf.jett.tag;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Color;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-
 import net.sf.jett.exception.TagParseException;
-import net.sf.jett.model.Block;
-import net.sf.jett.model.CellStyleCache;
-import net.sf.jett.model.ExcelColor;
-import net.sf.jett.model.FontCache;
-import net.sf.jett.model.Style;
-import net.sf.jett.model.WorkbookContext;
+import net.sf.jett.model.*;
 import net.sf.jett.parser.StyleParser;
 import net.sf.jett.transform.BlockTransformer;
 import net.sf.jett.util.AttributeUtil;
 import net.sf.jett.util.SheetUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A <code>StyleTag</code> represents a dynamically determined style for a
@@ -65,12 +52,11 @@ import net.sf.jett.util.SheetUtil;
  * {@link net.sf.jett.parser.TagParser}.</p>
  *
  * @author Randy Gettman
- * @since 0.4.0
  * @see net.sf.jett.transform.ExcelTransformer
+ * @since 0.4.0
  */
-public class StyleTag extends BaseTag
-{
-    private static final Logger logger = LogManager.getLogger();
+public class StyleTag extends BaseTag {
+    private static final Logger logger = LoggerFactory.getLogger(StyleTag.class);
 
     /**
      * Attribute that specifies the desired style property(ies) to change in the
@@ -83,9 +69,10 @@ public class StyleTag extends BaseTag
      * the current <code>Cell</code>.  Pre-defined styles are defined by
      * registering styles with the <code>ExcelTransformer</code> prior to
      * transformation.
-     * @since 0.5.0
+     *
      * @see net.sf.jett.transform.ExcelTransformer#addCssFile(String)
      * @see net.sf.jett.transform.ExcelTransformer#addCssText(String)
+     * @since 0.5.0
      */
     public static final String ATTR_CLASS = "class";
 
@@ -100,31 +87,31 @@ public class StyleTag extends BaseTag
 
     /**
      * Returns this <code>Tag's</code> name.
+     *
      * @return This <code>Tag's</code> name.
      */
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "style";
     }
 
     /**
      * Returns a <code>List</code> of required attribute names.
+     *
      * @return A <code>List</code> of required attribute names.
      */
     @Override
-    protected List<String> getRequiredAttributes()
-    {
+    protected List<String> getRequiredAttributes() {
         return super.getRequiredAttributes();
     }
 
     /**
      * Returns a <code>List</code> of optional attribute names.
+     *
      * @return A <code>List</code> of optional attribute names.
      */
     @Override
-    protected List<String> getOptionalAttributes()
-    {
+    protected List<String> getOptionalAttributes() {
         List<String> optAttrs = new ArrayList<>(super.getOptionalAttributes());
         optAttrs.addAll(OPT_ATTRS);
         return optAttrs;
@@ -135,11 +122,11 @@ public class StyleTag extends BaseTag
      * body.
      */
     @Override
-    public void validateAttributes() throws TagParseException
-    {
+    public void validateAttributes() throws TagParseException {
         super.validateAttributes();
-        if (isBodiless())
+        if (isBodiless()) {
             throw new TagParseException("Style tags must have a body.  Bodiless style tag found" + getLocation());
+        }
 
         TagContext context = getContext();
         WorkbookContext wc = getWorkbookContext();
@@ -150,36 +137,31 @@ public class StyleTag extends BaseTag
         myStyle = new Style();
 
         List<String> styleClasses = AttributeUtil.evaluateList(this, attributes.get(ATTR_CLASS), beans, null);
-        if (styleClasses != null)
-        {
-            for (String styleClass : styleClasses)
-            {
+        if (styleClasses != null) {
+            for (String styleClass : styleClasses) {
                 Style style = styleMap.get(styleClass.trim());
-                if (style != null)
+                if (style != null) {
                     myStyle.apply(style);
+                }
             }
         }
 
         String line = AttributeUtil.evaluateString(this, attributes.get(ATTR_STYLE), beans, null);
-        if (line != null)
-        {
+        if (line != null) {
             String[] styles = line.split(SPLIT_SPEC);
-            for (String strStyle : styles)
-            {
+            for (String strStyle : styles) {
                 String property;
                 String value;
                 // Replace escaped separators with the normal character for further
                 // processing.
                 String[] parts = strStyle.replace("\\" + SPEC_SEP, SPEC_SEP).split(":", 2);
-                if (parts.length < 2)
-                {
+                if (parts.length < 2) {
                     continue;
                 }
                 property = parts[0].trim();
                 value = parts[1].trim();
 
-                if (value.length() >= 1)
-                {
+                if (value.length() >= 1) {
                     StyleParser.addStyle(myStyle, property, value);
                 }
             }
@@ -189,12 +171,12 @@ public class StyleTag extends BaseTag
     /**
      * <p>Override the cells' current styles with any non-null style property
      * values.</p>
+     *
      * @return Whether the first <code>Cell</code> in the <code>Block</code>
-     *    associated with this <code>Tag</code> was processed.
+     * associated with this <code>Tag</code> was processed.
      */
     @Override
-    public boolean process()
-    {
+    public boolean process() {
         TagContext context = getContext();
         Sheet sheet = context.getSheet();
         Workbook workbook = sheet.getWorkbook();
@@ -205,20 +187,15 @@ public class StyleTag extends BaseTag
         int top = block.getTopRowNum();
         int bottom = block.getBottomRowNum();
 
-        if (myStyle.isStyleToApply())
-        {
+        if (myStyle.isStyleToApply()) {
             // Loop through Rows and Cells, and apply the style to each one in
             // turn.
-            for (int r = top; r <= bottom; r++)
-            {
+            for (int r = top; r <= bottom; r++) {
                 Row row = sheet.getRow(r);
-                if (row != null)
-                {
-                    for (int c = left; c <= right; c++)
-                    {
+                if (row != null) {
+                    for (int c = left; c <= right; c++) {
                         Cell cell = row.getCell(c);
-                        if (cell != null)
-                        {
+                        if (cell != null) {
                             examineAndApplyStyle(workbook, cell);
                         }
                     }
@@ -237,12 +214,12 @@ public class StyleTag extends BaseTag
      * necessary, replace its <code>CellStyle</code> and/or <code>Font</code,
      * guided by the property values retrieved earlier from the "style"
      * attribute.
+     *
      * @param workbook The <code>Workbook</code> that maintains all
-     *    <code>CellStyles</code> and <code>Fonts</code>.
-     * @param cell The <code>Cell</code> to examine.
+     *                 <code>CellStyles</code> and <code>Fonts</code>.
+     * @param cell     The <code>Cell</code> to examine.
      */
-    private void examineAndApplyStyle(Workbook workbook, Cell cell)
-    {
+    private void examineAndApplyStyle(Workbook workbook, Cell cell) {
         WorkbookContext wc = getWorkbookContext();
         CellStyleCache csCache = wc.getCellStyleCache();
         FontCache fCache = wc.getFontCache();
@@ -250,7 +227,7 @@ public class StyleTag extends BaseTag
         CellStyle cs = cell.getCellStyle();
         Font f = workbook.getFontAt(cs.getFontIndex());
 
-        logger.debug("eAAS: cell at ({}, {})", cell.getRowIndex(), cell.getColumnIndex());
+        logger.info("eAAS: cell at ({}, {})", cell.getRowIndex(), cell.getColumnIndex());
 
         short alignment = (myStyle.getAlignment() != null) ? myStyle.getAlignment().getIndex() : cs.getAlignment();
         short borderBottom = (myStyle.getBorderBottomType() != null) ? myStyle.getBorderBottomType().getIndex() : cs.getBorderBottom();
@@ -261,7 +238,7 @@ public class StyleTag extends BaseTag
         Color fillBackgroundColor = (myStyle.getFillBackgroundColor() != null) ?
                 SheetUtil.getColor(workbook, myStyle.getFillBackgroundColor()) : cs.getFillBackgroundColorColor();
         Color fillForegroundColor = (myStyle.getFillForegroundColor() != null) ?
-                SheetUtil.getColor(workbook, myStyle.getFillForegroundColor()): cs.getFillForegroundColorColor();
+                SheetUtil.getColor(workbook, myStyle.getFillForegroundColor()) : cs.getFillForegroundColorColor();
         short fillPattern = (myStyle.getFillPatternType() != null) ? myStyle.getFillPatternType().getIndex() : cs.getFillPattern();
         boolean hidden = (myStyle.isHidden() != null) ? myStyle.isHidden() : cs.getHidden();
         short indention = (myStyle.getIndention() != null) ? myStyle.getIndention() : cs.getIndention();
@@ -284,8 +261,7 @@ public class StyleTag extends BaseTag
         Color topBorderColor = null;
         Color fontColor;
         short rotationDegrees;
-        if (workbook instanceof HSSFWorkbook)
-        {
+        if (workbook instanceof HSSFWorkbook) {
             short hssfBottomBorderColor = (myStyle.getBorderBottomColor() != null) ?
                     ((HSSFColor) SheetUtil.getColor(workbook, myStyle.getBorderBottomColor())).getIndex() : cs.getBottomBorderColor();
             short hssfLeftBorderColor = (myStyle.getBorderLeftColor() != null) ?
@@ -296,20 +272,22 @@ public class StyleTag extends BaseTag
                     ((HSSFColor) SheetUtil.getColor(workbook, myStyle.getBorderTopColor())).getIndex() : cs.getTopBorderColor();
             short hssfFontColor = (myStyle.getFontColor() != null) ?
                     ((HSSFColor) SheetUtil.getColor(workbook, myStyle.getFontColor())).getIndex() : f.getColor();
-            if (hssfBottomBorderColor != 0)
+            if (hssfBottomBorderColor != 0) {
                 bottomBorderColor = ExcelColor.getHssfColorByIndex(hssfBottomBorderColor);
-            if (hssfLeftBorderColor != 0)
+            }
+            if (hssfLeftBorderColor != 0) {
                 leftBorderColor = ExcelColor.getHssfColorByIndex(hssfLeftBorderColor);
-            if (hssfRightBorderColor != 0)
+            }
+            if (hssfRightBorderColor != 0) {
                 rightBorderColor = ExcelColor.getHssfColorByIndex(hssfRightBorderColor);
-            if (hssfTopBorderColor != 0)
+            }
+            if (hssfTopBorderColor != 0) {
                 topBorderColor = ExcelColor.getHssfColorByIndex(hssfTopBorderColor);
+            }
             fontColor = ExcelColor.getHssfColorByIndex(hssfFontColor);
 
             rotationDegrees = (myStyle.getRotationDegrees() != null) ? myStyle.getRotationDegrees() : cs.getRotation();
-        }
-        else
-        {
+        } else {
             // XSSFWorkbook
             XSSFCellStyle xcs = (XSSFCellStyle) cs;
             bottomBorderColor = (myStyle.getBorderBottomColor() != null) ?
@@ -328,19 +306,16 @@ public class StyleTag extends BaseTag
             // But HSSF -1  => XSSF 91 , HSSF -15 => XSSF 105,
             //     HSSF -90 => XSSF 180.
             rotationDegrees = (myStyle.getRotationDegrees() != null) ? myStyle.getRotationDegrees() : cs.getRotation();
-            if (rotationDegrees < 0)
-            {
+            if (rotationDegrees < 0) {
                 rotationDegrees = (short) (90 - rotationDegrees);
             }
         }
 
         // Process row height/column width separately.
-        if (myStyle.getRowHeight() != null)
-        {
+        if (myStyle.getRowHeight() != null) {
             cell.getRow().setHeight(myStyle.getRowHeight());
         }
-        if (myStyle.getColumnWidth() != null)
-        {
+        if (myStyle.getColumnWidth() != null) {
             cell.getSheet().setColumnWidth(cell.getColumnIndex(), myStyle.getColumnWidth());
         }
 
@@ -353,8 +328,7 @@ public class StyleTag extends BaseTag
                 fontTypeOffset, locked, hidden);
 
         // Find the Font if not already found.
-        if (foundStyle == null)
-        {
+        if (foundStyle == null) {
             //short numFonts = workbook.getNumberOfFonts();
             //long start = System.nanoTime();
             Font foundFont = fCache.retrieveFont(fontBoldweight, fontItalic, fontColor, fontName,
@@ -363,8 +337,7 @@ public class StyleTag extends BaseTag
             //System.err.println("Find Font: " + (end - start) + " ns");
 
             // If Font still not found, then create it.
-            if (foundFont == null)
-            {
+            if (foundFont == null) {
                 //start = System.nanoTime();
                 foundFont = SheetUtil.createFont(workbook, fontBoldweight, fontItalic, fontColor, fontName,
                         fontHeightInPoints, fontUnderline, fontStrikeout, fontCharset, fontTypeOffset);

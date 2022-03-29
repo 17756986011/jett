@@ -1,22 +1,21 @@
 package net.sf.jett.tag;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-
 import net.sf.jett.exception.TagParseException;
 import net.sf.jett.expression.Expression;
 import net.sf.jett.expression.ExpressionFactory;
 import net.sf.jett.model.Block;
 import net.sf.jett.util.AttributeUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A <code>FormulaTag</code> represents a dynamically generated Excel
@@ -37,9 +36,8 @@ import net.sf.jett.util.AttributeUtil;
  * @author Randy Gettman
  * @since 0.4.0
  */
-public class FormulaTag extends BaseTag
-{
-    private static final Logger logger = LogManager.getLogger();
+public class FormulaTag extends BaseTag {
+    private static final Logger logger = LoggerFactory.getLogger(FormulaTag.class);
 
     /**
      * Attribute that specifies the bean name that contains the Expression
@@ -72,31 +70,31 @@ public class FormulaTag extends BaseTag
 
     /**
      * Returns this <code>Tag's</code> name.
+     *
      * @return This <code>Tag's</code> name.
      */
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "formula";
     }
 
     /**
      * Returns a <code>List</code> of required attribute names.
+     *
      * @return A <code>List</code> of required attribute names.
      */
     @Override
-    protected List<String> getRequiredAttributes()
-    {
+    protected List<String> getRequiredAttributes() {
         return super.getRequiredAttributes();
     }
 
     /**
      * Returns a <code>List</code> of optional attribute names.
+     *
      * @return A <code>List</code> of optional attribute names.
      */
     @Override
-    protected List<String> getOptionalAttributes()
-    {
+    protected List<String> getOptionalAttributes() {
         List<String> optAttrs = new ArrayList<>(super.getOptionalAttributes());
         optAttrs.addAll(OPT_ATTRS);
         return optAttrs;
@@ -108,11 +106,11 @@ public class FormulaTag extends BaseTag
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void validateAttributes() throws TagParseException
-    {
+    public void validateAttributes() throws TagParseException {
         super.validateAttributes();
-        if (!isBodiless())
+        if (!isBodiless()) {
             throw new TagParseException("Formula tags must not have a body.  Formula tag with body found" + getLocation());
+        }
 
         TagContext context = getContext();
         Map<String, Object> beans = context.getBeans();
@@ -123,18 +121,15 @@ public class FormulaTag extends BaseTag
         RichTextString formulaText = attributes.get(ATTR_TEXT);
 
         AttributeUtil.ensureExactlyOneExists(this, Arrays.asList(formulaBean, formulaText), Arrays.asList(ATTR_BEAN, ATTR_TEXT));
-        if (formulaBean != null)
-        {
+        if (formulaBean != null) {
             myFormulaExpression = Expression.evaluateString(
-                    "${" + formulaBean.toString() + "}", getWorkbookContext().getExpressionFactory(), beans)
+                            "${" + formulaBean.toString() + "}", getWorkbookContext().getExpressionFactory(), beans)
                     .toString();
-        }
-        else if (formulaText != null)
-        {
+        } else if (formulaText != null) {
             myFormulaExpression = attributes.get(ATTR_TEXT).getString();
         }
 
-        logger.debug("myFormulaExpression = {}", myFormulaExpression);
+        logger.info("myFormulaExpression = {}", myFormulaExpression);
 
         RichTextString rtsIfError = attributes.get(ATTR_IF_ERROR);
         myIfErrorExpression = (rtsIfError != null) ? rtsIfError.getString() : null;
@@ -144,12 +139,12 @@ public class FormulaTag extends BaseTag
      * <p>Evaluate the "text" attribute, and place the resultant text in an
      * Excel Formula.  If the "ifError" attribute is supplied, then wrap the
      * formula in an "IF(ISERROR(formula), ifError, formula)" formula.</p>
+     *
      * @return Whether the first <code>Cell</code> in the <code>Block</code>
-     *    associated with this <code>Tag</code> was processed.
+     * associated with this <code>Tag</code> was processed.
      */
     @Override
-    public boolean process()
-    {
+    public boolean process() {
         TagContext context = getContext();
         ExpressionFactory factory = getWorkbookContext().getExpressionFactory();
         Sheet sheet = context.getSheet();
@@ -161,27 +156,28 @@ public class FormulaTag extends BaseTag
         Row row = sheet.getRow(top);
         Cell cell = row.getCell(left);
 
-        logger.debug("myFormulaExpression: {}", myFormulaExpression);
+        logger.info("myFormulaExpression: {}", myFormulaExpression);
         String formulaText = Expression.evaluateString(myFormulaExpression, factory, beans).toString();
-        logger.debug("formulaText: {}", formulaText);
-        if (myIfErrorExpression != null)
-        {
+        logger.info("formulaText: {}", formulaText);
+        if (myIfErrorExpression != null) {
             Object errorResult = Expression.evaluateString(myIfErrorExpression, factory, beans);
-            logger.debug("errorResult: {}", errorResult);
+            logger.info("errorResult: {}", errorResult);
             String newFormulaText = "IF(ISERROR(" + formulaText + "), ";
             // Don't quote numbers!
-            if (!(errorResult instanceof Number))
+            if (!(errorResult instanceof Number)) {
                 newFormulaText += "\"";
+            }
             newFormulaText += errorResult.toString();
-            if (!(errorResult instanceof Number))
+            if (!(errorResult instanceof Number)) {
                 newFormulaText += "\"";
+            }
 
             newFormulaText += ", " + formulaText + ")";
 
             formulaText = newFormulaText;
         }
 
-        logger.debug("  Formula for row {}, cell {} is {}", top, left, formulaText);
+        logger.info("  Formula for row {}, cell {} is {}", top, left, formulaText);
         cell.setCellFormula(formulaText);
 
         return true;

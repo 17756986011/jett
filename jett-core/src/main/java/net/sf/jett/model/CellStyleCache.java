@@ -1,10 +1,6 @@
 package net.sf.jett.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import net.sf.jett.util.SheetUtil;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -14,8 +10,11 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.sf.jett.util.SheetUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>A <code>CellStyleCache</code> is used internally to keep track of
@@ -28,9 +27,8 @@ import net.sf.jett.util.SheetUtil;
  * @author Randy Gettman
  * @since 0.5.0
  */
-public class CellStyleCache
-{
-    private static final Logger logger = LogManager.getLogger();
+public class CellStyleCache {
+    private static final Logger logger = LoggerFactory.getLogger(CellStyleCache.class);
 
     private static final String PROP_SEP = "|";
 
@@ -43,8 +41,7 @@ public class CellStyleCache
      *
      * @param workbook A <code>Workbook</code>.
      */
-    public CellStyleCache(Workbook workbook)
-    {
+    public CellStyleCache(Workbook workbook) {
         myWorkbook = workbook;
         myCellStyleMap = new HashMap<>();
         cachePreExistingCellStyles();
@@ -53,12 +50,10 @@ public class CellStyleCache
     /**
      * Cache all <code>CellStyles</code> found within the workbook.
      */
-    private void cachePreExistingCellStyles()
-    {
+    private void cachePreExistingCellStyles() {
         int numCellStyles = myWorkbook.getNumCellStyles();
         logger.trace("Caching {} pre-existing cell styles.", numCellStyles);
-        for (int i = 0; i < numCellStyles; i++)
-        {
+        for (int i = 0; i < numCellStyles; i++) {
             cacheCellStyle(myWorkbook.getCellStyleAt(i));
         }
         logger.trace("Done caching pre-existing styles.");
@@ -69,8 +64,7 @@ public class CellStyleCache
      *
      * @return The number of entries in this cache.
      */
-    public int getNumEntries()
-    {
+    public int getNumEntries() {
         return myCellStyleMap.size();
     }
 
@@ -78,34 +72,35 @@ public class CellStyleCache
      * Retrieve a <code>CellStyle</code> from the cache with the given
      * properties.
      *
-     * @param fontBoldweight The font boldweight.
-     * @param fontItalic Whether the font is italic.
-     * @param fontColor The font color.
-     * @param fontName The font name.
-     * @param fontHeightInPoints The font height in points.
-     * @param alignment The horizontal alignment.
-     * @param borderBottom The bottom border type.
-     * @param borderLeft The left border type.
-     * @param borderRight The right border type.
-     * @param borderTop The top border type.
-     * @param dataFormat The data format string.
-     * @param fontUnderline The font underline.
-     * @param fontStrikeout Whether the font is in strikeout.
-     * @param wrapText Whether text is wrapped.
+     * @param fontBoldweight      The font boldweight.
+     * @param fontItalic          Whether the font is italic.
+     * @param fontColor           The font color.
+     * @param fontName            The font name.
+     * @param fontHeightInPoints  The font height in points.
+     * @param alignment           The horizontal alignment.
+     * @param borderBottom        The bottom border type.
+     * @param borderLeft          The left border type.
+     * @param borderRight         The right border type.
+     * @param borderTop           The top border type.
+     * @param dataFormat          The data format string.
+     * @param fontUnderline       The font underline.
+     * @param fontStrikeout       Whether the font is in strikeout.
+     * @param wrapText            Whether text is wrapped.
      * @param fillBackgroundColor The fill background color.
      * @param fillForegroundColor The fill foreground color.
-     * @param fillPattern The fill pattern.
-     * @param verticalAlignment The vertical alignment.
-     * @param indention How many characters the text is indented.
-     * @param rotation How many degrees the text is rotated.
-     * @param bottomBorderColor The bottom border color.
-     * @param leftBorderColor The left border color.
-     * @param rightBorderColor The right border color.
-     * @param topBorderColor The top border color.
-     * @param fontCharset The font charset.
-     * @param fontTypeOffset The font type offset.
-     * @param locked Whether the cell is "locked".
-     * @param hidden Whether the cell is "hidden".
+     * @param fillPattern         The fill pattern.
+     * @param verticalAlignment   The vertical alignment.
+     * @param indention           How many characters the text is indented.
+     * @param rotation            How many degrees the text is rotated.
+     * @param bottomBorderColor   The bottom border color.
+     * @param leftBorderColor     The left border color.
+     * @param rightBorderColor    The right border color.
+     * @param topBorderColor      The top border color.
+     * @param fontCharset         The font charset.
+     * @param fontTypeOffset      The font type offset.
+     * @param locked              Whether the cell is "locked".
+     * @param hidden              Whether the cell is "hidden".
+     *
      * @return A <code>CellStyle</code> that matches all given properties, or
      * <code>null</code> if it doesn't exist.
      */
@@ -114,8 +109,7 @@ public class CellStyleCache
                                        short borderTop, String dataFormat, byte fontUnderline, boolean fontStrikeout, boolean wrapText,
                                        Color fillBackgroundColor, Color fillForegroundColor, short fillPattern, short verticalAlignment,
                                        short indention, short rotation, Color bottomBorderColor, Color leftBorderColor, Color rightBorderColor,
-                                       Color topBorderColor, int fontCharset, short fontTypeOffset, boolean locked, boolean hidden)
-    {
+                                       Color topBorderColor, int fontCharset, short fontTypeOffset, boolean locked, boolean hidden) {
         String representation = getRepresentation(fontBoldweight, fontItalic, fontColor, fontName, fontHeightInPoints,
                 alignment, borderBottom, borderLeft, borderRight, borderTop, dataFormat, fontUnderline, fontStrikeout,
                 wrapText, fillBackgroundColor, fillForegroundColor, fillPattern, verticalAlignment, indention, rotation,
@@ -123,12 +117,12 @@ public class CellStyleCache
                 hidden
         );
         CellStyle cs = myCellStyleMap.get(representation);
-        if (logger.isTraceEnabled())
-        {
-            if (cs != null)
+        if (logger.isTraceEnabled()) {
+            if (cs != null) {
                 logger.trace("CSCache hit  : {}", representation);
-            else
+            } else {
                 logger.trace("CSCache miss!: {}", representation);
+            }
         }
         return cs;
     }
@@ -138,8 +132,7 @@ public class CellStyleCache
      *
      * @param cs A <code>CellStyle</code>.
      */
-    public void cacheCellStyle(CellStyle cs)
-    {
+    public void cacheCellStyle(CellStyle cs) {
         String representation = getRepresentation(cs);
         logger.trace("Caching cs   : {}", representation);
         myCellStyleMap.put(representation, cs);
@@ -148,17 +141,19 @@ public class CellStyleCache
     /**
      * Finds the given <code>CellStyle</code>, but with the font characteristics
      * of the given <code>Font</code>, not its own <code>Font</code>.
+     *
      * @param cs The <code>CellStyle</code>.  Cell style characteristics are
-     *    used, but the font characteristics are not used.
-     * @param f The <code>Font</code>.  These font characteristics are used
-     *    instead of the font characteristics on the <code>CellStyle</code>.
+     *           used, but the font characteristics are not used.
+     * @param f  The <code>Font</code>.  These font characteristics are used
+     *           instead of the font characteristics on the <code>CellStyle</code>.
+     *
      * @return The <code>CellStyle</code> with the cell style characteristics of
-     *    <code>cs</code> and the font characteristics of <code>f</code>, if
-     *    found, else <code>null</code>.
+     * <code>cs</code> and the font characteristics of <code>f</code>, if
+     * found, else <code>null</code>.
+     *
      * @since 0.10.0
      */
-    public CellStyle findCellStyleWithFont(CellStyle cs, Font f)
-    {
+    public CellStyle findCellStyleWithFont(CellStyle cs, Font f) {
         String representation = getRepresentation(cs, f);
         return myCellStyleMap.get(representation);
     }
@@ -166,11 +161,12 @@ public class CellStyleCache
     /**
      * Gets the string representation of the given <code>CellStyle</code>, using
      * its own font characteristics.
+     *
      * @param cs A <code>CellStyle</code>.
+     *
      * @return The string representation.
      */
-    private String getRepresentation(CellStyle cs)
-    {
+    private String getRepresentation(CellStyle cs) {
         return getRepresentation(cs, myWorkbook.getFontAt(cs.getFontIndex()));
     }
 
@@ -178,37 +174,40 @@ public class CellStyleCache
      * Gets the string representation of the given <code>CellStyle</code>, using
      * the cell style characteristics of the <code>CellStyle</code> and the font
      * characteristics of the given <code>Font</code>.
+     *
      * @param cs The <code>CellStyle</code>.  Cell style characteristics are
-     *    used, but the font characteristics are not used.
-     * @param f The <code>Font</code>.  These font characteristics are used
-     *    instead of the font characteristics on the <code>CellStyle</code>.
+     *           used, but the font characteristics are not used.
+     * @param f  The <code>Font</code>.  These font characteristics are used
+     *           instead of the font characteristics on the <code>CellStyle</code>.
+     *
      * @return The string representation.
+     *
      * @since 0.10.0
      */
-    private String getRepresentation(CellStyle cs, Font f)
-    {
+    private String getRepresentation(CellStyle cs, Font f) {
         // Colors that need an instanceof check
         Color fontColor;
         Color bottomColor = null;
         Color leftColor = null;
         Color rightColor = null;
         Color topColor = null;
-        if (cs instanceof HSSFCellStyle)
-        {
+        if (cs instanceof HSSFCellStyle) {
             HSSFFont hf = (HSSFFont) f;
             fontColor = hf.getHSSFColor((HSSFWorkbook) myWorkbook);
             // HSSF only stores border colors if the borders aren't "NONE".
-            if (cs.getBorderBottom() != CellStyle.BORDER_NONE)
+            if (cs.getBorderBottom() != CellStyle.BORDER_NONE) {
                 bottomColor = ExcelColor.getHssfColorByIndex(cs.getBottomBorderColor());
-            if (cs.getBorderLeft() != CellStyle.BORDER_NONE)
+            }
+            if (cs.getBorderLeft() != CellStyle.BORDER_NONE) {
                 leftColor = ExcelColor.getHssfColorByIndex(cs.getLeftBorderColor());
-            if (cs.getBorderRight() != CellStyle.BORDER_NONE)
+            }
+            if (cs.getBorderRight() != CellStyle.BORDER_NONE) {
                 rightColor = ExcelColor.getHssfColorByIndex(cs.getRightBorderColor());
-            if (cs.getBorderTop() != CellStyle.BORDER_NONE)
+            }
+            if (cs.getBorderTop() != CellStyle.BORDER_NONE) {
                 topColor = ExcelColor.getHssfColorByIndex(cs.getTopBorderColor());
-        }
-        else if (cs instanceof XSSFCellStyle)
-        {
+            }
+        } else if (cs instanceof XSSFCellStyle) {
             XSSFFont xf = (XSSFFont) f;
             fontColor = xf.getXSSFColor();
             XSSFCellStyle xcs = (XSSFCellStyle) cs;
@@ -216,9 +215,9 @@ public class CellStyleCache
             leftColor = xcs.getLeftBorderXSSFColor();
             rightColor = xcs.getRightBorderXSSFColor();
             topColor = xcs.getTopBorderXSSFColor();
-        }
-        else
+        } else {
             throw new IllegalArgumentException("Bad CellStyle type: " + cs.getClass().getName());
+        }
 
         return getRepresentation(f.getBoldweight(), f.getItalic(), fontColor, f.getFontName(),
                 f.getFontHeightInPoints(), cs.getAlignment(), cs.getBorderBottom(), cs.getBorderLeft(), cs.getBorderRight(),
@@ -231,34 +230,36 @@ public class CellStyleCache
     /**
      * Return the string representation of a <code>CellStyle</code> with the
      * given properties.
-     * @param fontBoldweight The font boldweight.
-     * @param fontItalic Whether the font is italic.
-     * @param fontColor The font color.
-     * @param fontName The font name.
-     * @param fontHeightInPoints The font height in points.
-     * @param alignment The horizontal alignment.
-     * @param borderBottom The bottom border type.
-     * @param borderLeft The left border type.
-     * @param borderRight The right border type.
-     * @param borderTop The top border type.
-     * @param dataFormat The data format string.
-     * @param fontUnderline The font underline.
-     * @param fontStrikeout Whether the font is in strikeout.
-     * @param wrapText Whether text is wrapped.
+     *
+     * @param fontBoldweight      The font boldweight.
+     * @param fontItalic          Whether the font is italic.
+     * @param fontColor           The font color.
+     * @param fontName            The font name.
+     * @param fontHeightInPoints  The font height in points.
+     * @param alignment           The horizontal alignment.
+     * @param borderBottom        The bottom border type.
+     * @param borderLeft          The left border type.
+     * @param borderRight         The right border type.
+     * @param borderTop           The top border type.
+     * @param dataFormat          The data format string.
+     * @param fontUnderline       The font underline.
+     * @param fontStrikeout       Whether the font is in strikeout.
+     * @param wrapText            Whether text is wrapped.
      * @param fillBackgroundColor The fill background color.
      * @param fillForegroundColor The fill foreground color.
-     * @param fillPattern The fill pattern.
-     * @param verticalAlignment The vertical alignment.
-     * @param indention How many characters the text is indented.
-     * @param rotation How many degrees the text is rotated.
-     * @param bottomBorderColor The bottom border color.
-     * @param leftBorderColor The left border color.
-     * @param rightBorderColor The right border color.
-     * @param topBorderColor The top border color.
-     * @param fontCharset The font charset.
-     * @param fontTypeOffset The font type offset.
-     * @param locked Whether the cell is "locked".
-     * @param hidden Whether the cell is "hidden".
+     * @param fillPattern         The fill pattern.
+     * @param verticalAlignment   The vertical alignment.
+     * @param indention           How many characters the text is indented.
+     * @param rotation            How many degrees the text is rotated.
+     * @param bottomBorderColor   The bottom border color.
+     * @param leftBorderColor     The left border color.
+     * @param rightBorderColor    The right border color.
+     * @param topBorderColor      The top border color.
+     * @param fontCharset         The font charset.
+     * @param fontTypeOffset      The font type offset.
+     * @param locked              Whether the cell is "locked".
+     * @param hidden              Whether the cell is "hidden".
+     *
      * @return The string representation.
      */
     private String getRepresentation(short fontBoldweight, boolean fontItalic, Color fontColor, String fontName,
@@ -266,8 +267,7 @@ public class CellStyleCache
                                      short borderTop, String dataFormat, byte fontUnderline, boolean fontStrikeout, boolean wrapText,
                                      Color fillBackgroundColor, Color fillForegroundColor, short fillPattern, short verticalAlignment,
                                      short indention, short rotation, Color bottomBorderColor, Color leftBorderColor, Color rightBorderColor,
-                                     Color topBorderColor, int fontCharset, short fontTypeOffset, boolean locked, boolean hidden)
-    {
+                                     Color topBorderColor, int fontCharset, short fontTypeOffset, boolean locked, boolean hidden) {
         StringBuilder buf = new StringBuilder();
 
         buf.append(fontBoldweight).append(PROP_SEP);
